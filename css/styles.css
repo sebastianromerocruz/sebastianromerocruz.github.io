@@ -1,0 +1,49 @@
+body {
+    font-family: "Overpass";
+    color: #010a43;
+}
+
+/* Landing Page */
+
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+p {
+    font-size: 1.5rem;
+    line-height: 1.5;
+}
+
+.navbar {
+    padding-left: 0;
+}
+
+.navbar-item:hover {
+    color: #ffc2c2;
+}
+
+.container-fluid {
+    padding: 0% 10%;
+}
+
+.site-logo {
+    color: #010a43
+}
+
+.site-logo:hover {
+    color: #ffc2c2;
+}
+
+.hover-photo-text {
+    text-decoration: underline !important;
+}
+
+.hover-photo-text:hover {
+    color: #ffc2c2 !important;
+}
+
+.landing-picture {
+    width: 100%;
+}
