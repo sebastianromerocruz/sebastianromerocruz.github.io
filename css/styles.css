@@ -1,19 +1,23 @@
 body {
     font-family: "Overpass";
-    color: #010a43;
 }
 
 /* Landing Page */
-
-h1 {
+h1, h2, h3, h4, h5, h6 {
     font-size: 2rem;
     font-weight: bold;
     line-height: 1.5;
+    color: #010a43;
 }
 
 p {
     font-size: 1.5rem;
     line-height: 1.5;
+}
+
+.japanese-text {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 1.45rem;
 }
 
 .navbar {
@@ -37,13 +41,60 @@ p {
 }
 
 .hover-photo-text {
-    text-decoration: underline !important;
+    border-bottom: solid 2px;
 }
 
 .hover-photo-text:hover {
-    color: #ffc2c2 !important;
+    border-bottom: solid 0px;
+    color: #ffc2c2;
 }
 
 .landing-picture {
     width: 100%;
+}
+
+.ranking {
+    font-size: 1rem;
+    color: #C0C0C0;
+}
+
+.skill-logo {
+    color: #010a43;
+    margin-bottom: 0;
+}
+
+.python-bar {
+    background-color: #ffe873;
+}
+
+.html-bar {
+    background-color: #F16529;
+}
+
+.css-bar {
+    background-color: #264de4;
+}
+
+.js-bar {
+    background-color: #F0DB4F;
+}
+
+.java-bar {
+    background-color: #ED8B00;
+}
+
+.c-sharp-bar {
+    background-color: #800080;
+}
+
+.bootstrap-bar {
+    background-color: #602c50;
+}
+
+.jquery-bar {
+    background-color: #0868AC;
+}
+
+.d3-bar {
+    background-color: #ffA800;
 }
