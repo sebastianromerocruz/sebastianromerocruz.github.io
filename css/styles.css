@@ -56,6 +56,11 @@ p {
 .ranking {
     font-size: 1rem;
     color: #C0C0C0;
+    margin-bottom: 0;
+}
+
+.ranking-rule {
+    margin-top: 0;
 }
 
 .skill-logo {

@@ -11,7 +11,7 @@ const JAPANESE_TRANSLATIONS = {
     ],
     "intro": [
         "NYで、フロントエンド開発者と大学の教師にとして働いています。",
-        "i am a nyc-based <span class=\"hover-photo-text\" id=\"front-end\">front-end</span> developer."
+        "i am a nyc-based professor and <span class=\"hover-photo-text\" id=\"developer\">developer</span>."
     ],
     "vocation": [
         "メキシコ出身で、ニューヨーク大学で化学工学もコンピューター科学も、私は勉強しました。",
@@ -44,14 +44,38 @@ const SKILL_BAR_PROGRESS = {
     "d3-bar": "85%"
 };
 
-HOVER_PICTURES.forEach(addPictureHoverListener);
+var Animation = {
+    FILL: 1,
+    RESET: 2
+};
 
 var Language = {
     ENGLISH: 1,
     JAPANESE: 2
 };
 
+HOVER_PICTURES.forEach(addPictureHoverListener);
+
 var currentLanguage = Language.ENGLISH;
+
+function addOtherHoverListener() {
+    $("#developer").hover(() => {
+        $(".landing-picture").first().addClass("d-none");
+        $(".technical-skills").first().removeClass("d-none");
+        animateProgressBars(SKILL_BAR_PROGRESS, Animation.FILL);
+    }, () => {
+        $(".landing-picture").first().removeClass("d-none");
+        $(".technical-skills").first().addClass("d-none");
+
+        animateProgressBars(SKILL_BAR_PROGRESS, Animation.RESET);
+    });
+}
+
+addOtherHoverListener();
+
+function resetProgressBars() {
+
+}
 
 function addPictureHoverListener(hoverPictureID, index) {
     if (hoverPictureID == "japanese") {
@@ -90,12 +114,10 @@ function replaceText(paragraphIDs, index) {
     }
 }
 
-function animateProgressBars(progressBars, index) {
+function animateProgressBars(progressBars, reset) {
     for (const progressBarID in progressBars) {
         $("." + progressBarID).animate({
-            width: progressBars[progressBarID]
+            width: reset === Animation.FILL ? progressBars[progressBarID] : 0
         }, 100);
     }
 }
-
-animateProgressBars(SKILL_BAR_PROGRESS);
