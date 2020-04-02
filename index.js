@@ -44,6 +44,11 @@ const SKILL_BAR_PROGRESS = {
     "d3-bar": "85%"
 };
 
+var PageState = {
+    HOVER: 1,
+    CLICK: 2
+};
+
 var Animation = {
     FILL: 1,
     RESET: 2
@@ -54,13 +59,16 @@ var Language = {
     JAPANESE: 2
 };
 
-HOVER_PICTURES.forEach(addPictureHoverListener);
-
 var currentLanguage = Language.ENGLISH;
+var pageState = PageState.HOVER;
 
-function addOtherHoverListener() {
+function addProgressHoverListener() {
     $("#developer").hover(() => {
+        if (pageState === PageState.CLICK) {
+            pageState = PageState.HOVER;
+        }
         $(".landing-picture").first().addClass("d-none");
+        $(".education").first().addClass("d-none");
         $(".technical-skills").first().removeClass("d-none");
         animateProgressBars(SKILL_BAR_PROGRESS, Animation.FILL);
     }, () => {
@@ -71,10 +79,14 @@ function addOtherHoverListener() {
     });
 }
 
-addOtherHoverListener();
-
-function resetProgressBars() {
-
+function addEducationClickListener() {
+    $("#nyu").click(() => {
+        pageState = PageState.CLICK;
+        $(".landing-picture").first().addClass("d-none");
+        $(".education").first().removeClass("d-none");
+        $(".technical-skills").first().addClass("d-none");
+        // animateProgressBars(SKILL_BAR_PROGRESS, Animation.FILL);
+    });
 }
 
 function addPictureHoverListener(hoverPictureID, index) {
@@ -91,6 +103,14 @@ function addPictureHoverListener(hoverPictureID, index) {
     }
 
     $("#" + hoverPictureID).hover(() => {
+        if (pageState === PageState.CLICK) {
+            pageState = PageState.HOVER;
+            
+            $(".landing-picture").first().removeClass("d-none");
+            $(".education").first().addClass("d-none");
+            $(".technical-skills").first().addClass("d-none");
+        }
+
         $(".landing-picture").first()
             .attr("src", "images/" + hoverPictureID + ".jpg");
     }, () => {
@@ -121,3 +141,14 @@ function animateProgressBars(progressBars, reset) {
         }, 100);
     }
 }
+
+// MAIN
+function main() {
+    HOVER_PICTURES.forEach(addPictureHoverListener);
+    addProgressHoverListener();
+    addEducationClickListener();
+}
+
+$(document).ready(() => {
+    main();
+});

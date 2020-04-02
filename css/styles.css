@@ -41,6 +41,7 @@ p {
 }
 
 .hover-photo-text {
+    color: #010a43;
     border-bottom: solid 2px;
 }
 
@@ -51,6 +52,10 @@ p {
 
 .landing-picture {
     width: 100%;
+}
+
+#nyu {
+    cursor: pointer;
 }
 
 .ranking {
@@ -102,4 +107,33 @@ p {
 
 .d3-bar {
     background-color: #ffA800;
+}
+
+.click-text {
+    font-size: 1rem;
+    color: #C0C0C0;
+    margin-bottom: 3%;
+}
+
+.card {
+    border: none;
+}
+
+.card-title {
+    text-align: left;
+    font-size: 1.5rem;
+}
+
+.edu-button {
+    background-color: #010a43;
+    margin: 0 5%;
+}
+
+.edu-button-pressed {
+    color: #010a43;
+    background-color: #ffc2c2;
+}
+
+.nyu-logo {
+    width: 75%;
 }
