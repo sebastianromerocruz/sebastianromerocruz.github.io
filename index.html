@@ -89,7 +89,7 @@
                 </div>
                 <div class="col-lg-6">
                     <!-- Landing pictures -->
-                    <img src="images/profile.jpg" alt="landing-picture" class="landing-picture">
+                    <img src="images/profile.jpg" alt="landing-picture" class="landing-picture d-none">
 
                     <!-- Progress bar stuff -->
                     <div class="container-fluid technical-skills d-none">
@@ -249,6 +249,34 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Japanese -->
+                    <div class="japanese d-none">
+                        <h1>Hi, I'm <span class="hover-photo-text">Sebastián</span></h1>
+                        <p class="japanese-text">
+                            NYCで、大学教授兼フロントエンド<span class="hover-photo-text japanese-text">開発者</span>として働いています。
+                        </p>
+                        <p class="japanese-text">
+                            私は<span class="hover-photo-text japanese-text">メキシコ</span>出身で、<span class="hover-photo-text japanese-text">ニューヨーク大学</span>において化学工学とコンピューター科学を、勉強しました。
+                        </p>
+                        <p class="japanese-text">
+                            専門は技術的でしたが、色々な分野からインスピレーションを取り入れて、できるだけクリエーティブにするのが好きです。
+                        </p>
+                        <p class="japanese-text">
+                            私の趣味は、<span class="hover-photo-text japanese-text" style="color: #ffc2c2; border-bottom: solid 0px;">外国語</span>の学習、音楽、そして弓道です。
+                        </p>
+                        <p class="japanese-text">
+                            使い捨てカメラを使ってますけど<a class="hover-photo-text japanese-text" href="https://www.instagram.com/ghstpkmn/">Instagram</a>も<a class="hover-photo-text japanese-text" href="https://www.linkedin.com/in/sebastian-romerocruz/">LinkedIn</a>もやっています。
+                        </p>
+                        <p class="japanese-text">
+                            私の<span class = "hover-photo-text japanese-text">履歴書</span>にご興味のある方はぜひご覧になって下さい。
+                        </p>
+                    </div>
+
+                    <!-- Maps -->
+                    <div class="map">
+                        <svg id="my_dataviz"width="440" height="600"></svg>
+                    </div>
                 </div>
 
             </div>
@@ -257,10 +285,13 @@
     </section>
 
     <!-- Javascript files -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="index.js">
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
 
-    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="index.js"></script>
+    <script src="map.js"></script>
 </body>
 
 </html>

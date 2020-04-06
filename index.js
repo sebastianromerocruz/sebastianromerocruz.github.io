@@ -1,36 +1,27 @@
 const HOVER_PICTURES = [
     "profile",
     "mexico",
-    "japanese"
 ];
 
-const JAPANESE_TRANSLATIONS = {
-    "title": [
-        "セバスチャンです。",
-        "hi, i'm <span class=\"hover-photo-text\" id=\"profile\">sebastián</span>"
-    ],
-    "intro": [
-        "NYで、フロントエンド開発者と大学の教師にとして働いています。",
-        "i am a nyc-based professor and <span class=\"hover-photo-text\" id=\"developer\">developer</span>."
-    ],
-    "vocation": [
-        "メキシコ出身で、ニューヨーク大学で化学工学もコンピューター科学も、私は勉強しました。",
-        "i was born in <span class=\"hover-photo-text\" id=\"mexico\">mexico city</span>, and studied <span class=\"hover-photo-text\" id=\"cbe\">chemical and biomolecular engineering</span> and later computer science at <span class=\"hover-photo-text\" id=\"nyu\">nyu</span>."
-    ],
-    "explanation": [
-        "専門は技術的だったのに、自分の作品になると色々な分野からインスピレーションを入れて、できるだけクリエーティブにするのが好きです。",
-        "quantitative as my training may be, i like to be as creative in my work as i can, bringing in inspiration from a number of other crafts."
-    ],
-    "hobbies": ["", ""],
-    "contact": [
-        "InstagramにもLinkedInにも私が見つかります。",
-        "you can find me on instagram shooting on cheap disposable cameras, or on linkedin if you're more into that sort of thing."
-    ],
-    "resume": [
-        "それに、私の履歴書が見たかったら、ごゆっくりどうぞ。",
-        "you can also check my résumé out <span>here</span>."
-    ]
-};
+const JAPANESE_HTML = `<h1>私は<span class="hover-photo-text">セバスチャン</span>といいます。</h1>
+<p>
+    NYCで、大学教授兼フロントエンド<span class="hover-photo-text">開発者</span>として働いています。
+</p>
+<p>
+    私は<span class="hover-photo-text">メキシコ</span>出身で、<span class="hover-photo-text">ニューヨーク大学</span>において化学工学とコンピューター科学を、勉強しました。
+</p>
+<p>
+    専門は技術的でしたが、色々な分野からインスピレーションを取り入れて、できるだけクリエーティブにするのが好きです。
+</p>
+<p>
+    私の趣味は、外国語の学習、音楽、そして弓道です。
+</p>
+<p>
+    使い捨てカメラを使ってますけど<a class="hover-photo-text" href="https://www.instagram.com/ghstpkmn/">Instagram</a>も<a class="hover-photo-text" href="https://www.linkedin.com/in/sebastian-romerocruz/">LinkedIn</a>もやっています。
+</p>
+<p>
+    私の<span class = "hover-photo-text">履歴書</span>にご興味のある方はぜひご覧になって下さい。
+</p>`;
 
 const SKILL_BAR_PROGRESS = {
     "python-bar": "90%",
@@ -89,23 +80,29 @@ function addEducationClickListener() {
     });
 }
 
-function addPictureHoverListener(hoverPictureID, index) {
-    if (hoverPictureID == "japanese") {
-        var keys = Object.keys(JAPANESE_TRANSLATIONS);
-        $("#" + hoverPictureID).hover(() => {
-            keys.forEach(replaceText);
-            currentLanguage = currentLanguage === Language.ENGLISH ? Language.JAPANESE : Language.ENGLISH;
-        }, () => {
-            keys.forEach(replaceText);
-            currentLanguage = currentLanguage === Language.ENGLISH ? Language.JAPANESE : Language.ENGLISH;
-        });
-        return
-    }
+function addJapaneseHoverListener() {
+    $("#japanese").hover(() => {
+        if (pageState === PageState.CLICK) {
+            pageState = PageState.HOVER;
+        }
 
+        $(".landing-picture").first().addClass("d-none");
+        $(".education").first().addClass("d-none");
+        $(".technical-skills").first().addClass("d-none");
+        $(".japanese").first().removeClass("d-none");
+    }, () => {
+        $(".landing-picture").first().removeClass("d-none");
+        $(".education").first().addClass("d-none");
+        $(".technical-skills").first().addClass("d-none");
+        $(".japanese").first().addClass("d-none");
+    });
+}
+
+function addPictureHoverListener(hoverPictureID, index) {
     $("#" + hoverPictureID).hover(() => {
         if (pageState === PageState.CLICK) {
             pageState = PageState.HOVER;
-            
+
             $(".landing-picture").first().removeClass("d-none");
             $(".education").first().addClass("d-none");
             $(".technical-skills").first().addClass("d-none");
@@ -117,21 +114,6 @@ function addPictureHoverListener(hoverPictureID, index) {
         $(".landing-picture").first()
             .attr("src", "images/profile.jpg");
     });
-}
-
-function replaceText(paragraphIDs, index) {
-    if (currentLanguage === Language.ENGLISH) {
-        $("#" + paragraphIDs).addClass("japanese-text");
-        console.log("adding class");
-    } else {
-        $("#" + paragraphIDs).removeClass("japanese-text");
-        console.log("removing class");
-    }
-    if (paragraphIDs !== "hobbies") {
-        $("#" + paragraphIDs).html(
-            JAPANESE_TRANSLATIONS[paragraphIDs][currentLanguage === Language.ENGLISH ? 0 : 1]
-        );
-    }
 }
 
 function animateProgressBars(progressBars, reset) {
@@ -147,6 +129,7 @@ function main() {
     HOVER_PICTURES.forEach(addPictureHoverListener);
     addProgressHoverListener();
     addEducationClickListener();
+    addJapaneseHoverListener();
 }
 
 $(document).ready(() => {
