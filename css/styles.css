@@ -137,3 +137,39 @@ p {
 .nyu-logo {
     width: 75%;
 }
+
+/* MAPS */
+.countries {
+    fill: #010a43;
+    stroke: #6cb0e0;
+    stroke-width: 0.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.airports {
+    fill: #036;
+    stroke: #6cb0e0;
+    stroke-width: 0.5px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+#d3-map {
+    background-color: #146b8a;
+}
+
+.plane {
+    fill: #ffc2c2;
+}
+
+.map-text {
+    fill: #ffc2c2;
+    font-size: 0.5rem;
+}
+
+.route {
+    opacity: 0;
+}
