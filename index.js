@@ -1,6 +1,7 @@
 const HOVER_PICTURES = [
     "profile",
     "mexico",
+    "kyudo"
 ];
 
 const JAPANESE_HTML = `<h1>私は<span class="hover-photo-text">セバスチャン</span>といいます。</h1>
@@ -50,6 +51,11 @@ var Language = {
     JAPANESE: 2
 };
 
+var Format = {
+    JPG: 1,
+    GIF:2
+}
+
 var currentLanguage = Language.ENGLISH;
 var pageState = PageState.HOVER;
 
@@ -60,6 +66,8 @@ function addProgressHoverListener() {
         }
         $(".landing-picture").first().addClass("d-none");
         $(".education").first().addClass("d-none");
+        $(".map").first().addClass("d-none");
+
         $(".technical-skills").first().removeClass("d-none");
         animateProgressBars(SKILL_BAR_PROGRESS, Animation.FILL);
     }, () => {
@@ -71,12 +79,23 @@ function addProgressHoverListener() {
 }
 
 function addEducationClickListener() {
-    $("#nyu").click(() => {
-        pageState = PageState.CLICK;
-        $(".landing-picture").first().addClass("d-none");
-        $(".education").first().removeClass("d-none");
+    $("#nyu").hover(() => {
+        // pageState = PageState.CLICK;
+        if (pageState === PageState.CLICK) {
+            pageState = PageState.HOVER;
+        }
+
         $(".technical-skills").first().addClass("d-none");
-        // animateProgressBars(SKILL_BAR_PROGRESS, Animation.FILL);
+        $(".map").first().addClass("d-none");
+        $(".landing-picture").first().addClass("d-none");
+        $(".japanese").first().addClass("d-none");
+
+        $(".education").first().removeClass("d-none");
+
+    }, () => {
+        $(".landing-picture").first().removeClass("d-none");
+
+        $(".education").first().addClass("d-none");
     });
 }
 
@@ -92,8 +111,7 @@ function addJapaneseHoverListener() {
         $(".japanese").first().removeClass("d-none");
     }, () => {
         $(".landing-picture").first().removeClass("d-none");
-        $(".education").first().addClass("d-none");
-        $(".technical-skills").first().addClass("d-none");
+
         $(".japanese").first().addClass("d-none");
     });
 }
@@ -109,7 +127,7 @@ function addPictureHoverListener(hoverPictureID, index) {
         }
 
         $(".landing-picture").first()
-            .attr("src", "images/" + hoverPictureID + ".jpg");
+            .attr("src", "images/" + hoverPictureID + (hoverPictureID === "kyudo" ? ".gif" : ".jpg"));
     }, () => {
         $(".landing-picture").first()
             .attr("src", "images/profile.jpg");
