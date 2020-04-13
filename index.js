@@ -4,26 +4,6 @@ const HOVER_PICTURES = [
     "kyudo"
 ];
 
-const JAPANESE_HTML = `<h1>私は<span class="hover-photo-text">セバスチャン</span>といいます。</h1>
-<p>
-    NYCで、大学教授兼フロントエンド<span class="hover-photo-text">開発者</span>として働いています。
-</p>
-<p>
-    私は<span class="hover-photo-text">メキシコ</span>出身で、<span class="hover-photo-text">ニューヨーク大学</span>において化学工学とコンピューター科学を、勉強しました。
-</p>
-<p>
-    専門は技術的でしたが、色々な分野からインスピレーションを取り入れて、できるだけクリエーティブにするのが好きです。
-</p>
-<p>
-    私の趣味は、外国語の学習、音楽、そして弓道です。
-</p>
-<p>
-    使い捨てカメラを使ってますけど<a class="hover-photo-text" href="https://www.instagram.com/ghstpkmn/">Instagram</a>も<a class="hover-photo-text" href="https://www.linkedin.com/in/sebastian-romerocruz/">LinkedIn</a>もやっています。
-</p>
-<p>
-    私の<span class = "hover-photo-text">履歴書</span>にご興味のある方はぜひご覧になって下さい。
-</p>`;
-
 const SKILL_BAR_PROGRESS = {
     "python-bar": "90%",
     "html-bar": "70%",
@@ -35,6 +15,19 @@ const SKILL_BAR_PROGRESS = {
     "jquery-bar": "70%",
     "d3-bar": "85%"
 };
+
+const LISTENER_IDS = [
+    "japanese",
+    "education",
+    "technical-skills"
+];
+
+const INSTRUMENT_BAR_PROGRESS = {
+    "bass": "90%",
+    "guitar": "70%",
+    "piano": "60%",
+    "ukulele": "60%"
+}
 
 var PageState = {
     HOVER: 1,
@@ -51,86 +44,42 @@ var Language = {
     JAPANESE: 2
 };
 
-var Format = {
-    JPG: 1,
-    GIF:2
+var ActiveElement = {
+    LANDING: 1,
+    SKILLS: 2,
+    MAP: 3,
+    EDUCATION: 4,
+    LANGUAGES: 5
 }
 
 var currentLanguage = Language.ENGLISH;
 var pageState = PageState.HOVER;
-
-function addProgressHoverListener() {
-    $("#developer").hover(() => {
-        if (pageState === PageState.CLICK) {
-            pageState = PageState.HOVER;
-        }
-        $(".landing-picture").first().addClass("d-none");
-        $(".education").first().addClass("d-none");
-        $(".map").first().addClass("d-none");
-
-        $(".technical-skills").first().removeClass("d-none");
-        animateProgressBars(SKILL_BAR_PROGRESS, Animation.FILL);
-    }, () => {
-        $(".landing-picture").first().removeClass("d-none");
-        $(".technical-skills").first().addClass("d-none");
-
-        animateProgressBars(SKILL_BAR_PROGRESS, Animation.RESET);
-    });
-}
-
-function addEducationClickListener() {
-    $("#nyu").hover(() => {
-        // pageState = PageState.CLICK;
-        if (pageState === PageState.CLICK) {
-            pageState = PageState.HOVER;
-        }
-
-        $(".technical-skills").first().addClass("d-none");
-        $(".map").first().addClass("d-none");
-        $(".landing-picture").first().addClass("d-none");
-        $(".japanese").first().addClass("d-none");
-
-        $(".education").first().removeClass("d-none");
-
-    }, () => {
-        $(".landing-picture").first().removeClass("d-none");
-
-        $(".education").first().addClass("d-none");
-    });
-}
-
-function addJapaneseHoverListener() {
-    $("#japanese").hover(() => {
-        if (pageState === PageState.CLICK) {
-            pageState = PageState.HOVER;
-        }
-
-        $(".landing-picture").first().addClass("d-none");
-        $(".education").first().addClass("d-none");
-        $(".technical-skills").first().addClass("d-none");
-        $(".japanese").first().removeClass("d-none");
-    }, () => {
-        $(".landing-picture").first().removeClass("d-none");
-
-        $(".japanese").first().addClass("d-none");
-    });
-}
+var activeElement = ActiveElement.LANDING;
 
 function addPictureHoverListener(hoverPictureID, index) {
     $("#" + hoverPictureID).hover(() => {
         if (pageState === PageState.CLICK) {
             pageState = PageState.HOVER;
 
-            $(".landing-picture").first().removeClass("d-none");
-            $(".education").first().addClass("d-none");
-            $(".technical-skills").first().addClass("d-none");
+            $(".img-container").first().removeClass("d-none");
+            disablePreviousActiveElement(activeElement);
+            activeElement = ActiveElement.LANDING;
         }
 
         $(".landing-picture").first()
             .attr("src", "images/" + hoverPictureID + (hoverPictureID === "kyudo" ? ".gif" : ".jpg"));
+        if (hoverPictureID === "kyudo") {
+            $(".landing-picture").first()
+                .addClass("kyudo-gif");
+        }
     }, () => {
         $(".landing-picture").first()
             .attr("src", "images/profile.jpg");
+
+        if (hoverPictureID === "kyudo") {
+            $(".landing-picture").first()
+                .removeClass("kyudo-gif");
+        }
     });
 }
 
@@ -142,12 +91,68 @@ function animateProgressBars(progressBars, reset) {
     }
 }
 
+function disablePreviousActiveElement(previousActiveElement) {
+    switch (previousActiveElement) {
+        case ActiveElement.LANDING:
+            $(".img-container").first().addClass("d-none");
+            break;
+        case ActiveElement.SKILLS:
+            $(".img-container").first().removeClass("d-none");
+            $(".technical-skills").first().addClass("d-none");
+            animateProgressBars(SKILL_BAR_PROGRESS, Animation.RESET);
+            activeElement = ActiveElement.LANDING;
+            break;
+        case ActiveElement.MAP:
+            $(".img-container").first().removeClass("d-none");
+            $(".map").first().addClass("d-none");
+            activeElement = ActiveElement.LANDING;
+            break;
+        case ActiveElement.EDUCATION:
+            $(".img-container").first().removeClass("d-none");
+            $(".education").first().addClass("d-none");
+            activeElement = ActiveElement.LANDING;
+            break;
+        case ActiveElement.LANGUAGES:
+            $(".img-container").first().removeClass("d-none");
+            $(".japanese").first().addClass("d-none");
+            activeElement = ActiveElement.LANDING;
+            break;
+    }
+}
+
+function addListeners() {
+    HOVER_PICTURES.forEach(addPictureHoverListener);
+
+    LISTENER_IDS.forEach((id) => {
+        $("#" + id).hover(() => {
+            if (pageState === PageState.CLICK) {
+                pageState = PageState.HOVER;
+            }
+
+            $("." + id).first().removeClass("d-none");
+            disablePreviousActiveElement(activeElement);
+
+            switch (id) {
+                case "japanese":
+                    activeElement = ActiveElement.LANGUAGES;
+                    break;
+                case "education":
+                    activeElement = ActiveElement.EDUCATION;
+                    break;
+                case "technical-skills":
+                    activeElement = ActiveElement.SKILLS;
+                    animateProgressBars(SKILL_BAR_PROGRESS, Animation.FILL);
+                    break;
+            }
+        }, () => {
+            disablePreviousActiveElement(activeElement);
+        });
+    });
+}
+
 // MAIN
 function main() {
-    HOVER_PICTURES.forEach(addPictureHoverListener);
-    addProgressHoverListener();
-    addEducationClickListener();
-    addJapaneseHoverListener();
+    addListeners();
 }
 
 $(document).ready(() => {

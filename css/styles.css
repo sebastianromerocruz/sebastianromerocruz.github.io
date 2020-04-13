@@ -55,6 +55,10 @@ p {
     height: auto;
 }
 
+.kyudo-gif {
+    width: 65%;
+}
+
 #nyu {
     cursor: pointer;
 }
