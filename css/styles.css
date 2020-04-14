@@ -4,7 +4,7 @@ body {
 
 /* Landing Page */
 h1, h2, h3, h4, h5, h6 {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: bold;
     line-height: 1.5;
     color: #010a43;
@@ -30,6 +30,8 @@ p {
 
 .container-fluid {
     padding: 0% 10%;
+    /* height:100vh;
+    overflow: auto; */
 }
 
 .site-logo {
@@ -129,16 +131,6 @@ p {
     font-size: 1.5rem;
 }
 
-/* .edu-button {
-    background-color: #010a43;
-    margin: 0 5%;
-}
-
-.edu-button-pressed {
-    color: #010a43;
-    background-color: #ffc2c2;
-} */
-
 .nyu-logo {
     width: 75%;
 }
@@ -204,4 +196,17 @@ p {
 
 .route {
     opacity: 0;
+}
+
+.footer-text {
+    color: #C0C0C0;
+}
+
+.footer-explanation {
+    border-bottom: solid 0.5px;
+    cursor: pointer;
+}
+
+.modal-title {
+    font-size: 1.5rem;
 }

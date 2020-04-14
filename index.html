@@ -47,12 +47,30 @@
                 <div class="collapse navbar-collapse" id="navbarToggler">
                     <ul class="navbar-nav ml-auto">
                         <li class="navbar-item">
-                            <a class="nav-link" href="#">Résumé</a>
-                        </li>
-                        <li class="navbar-item">
-                            <a class="nav-link" href="#">Contact</a>
+                            <a class="nav-link" data-toggle="modal" data-target="#contactModal">Contact</a>
                         </li>
                     </ul>
+
+                    <div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="contactModalTitle">Let's get in touch!</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="business-card">
+                                        <i class="site-logo fas fa-ghost"></i> Sebastián Romero Cruz
+                                        <br>
+                                        <i class="site-logo fas fa-envelope"></i> <a href = "mailto: sebastianromerocruz@gmail.com">sebastianromerocruz@gmail.com</a>
+                                        <br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </nav>
 
@@ -71,21 +89,48 @@
                         I am a NYC-based professor and <span class="hover-photo-text" id="technical-skills">developer</span>.
                     </p>
                     <p id="vocation">
-                        I was born in <span class="hover-photo-text" id="mexico">Mexico City</span>, and later <span class="hover-photo-text" id="moved">moved</span> to New York, where I studied at <span class="hover-photo-text" id="education">NYU</span>.
+                        I was born in <span class="hover-photo-text" id="mexico">Mexico City</span>, and later <span class="hover-photo-text" id="moved">moved</span> to New York, where I studied at <span class="hover-photo-text"
+                            id="education">NYU</span>.
                     </p>
                     <p id="explanation">
-                        Quantitative as my training may be, I like to be as creative in my work as I can, bringing in inspiration from a number of other crafts.
+                        Quantitative as my training may be, I like to be as creative in my work as I can, bringing in inspiration from as many fields as possible.
                     </p>
                     <p id="hobbies">
                         Outside of work, some of my interests involve learning other <span class="hover-photo-text" id="japanese">languages</span>, music, and <span class="hover-photo-text" id="kyudo">kyūdō</span>.
                     </p>
-                    <p id="contact">
+                    <!-- <p id="contact">
                         You can find me on <a class="hover-photo-text" href="https://www.instagram.com/ghstpkmn/">Instagram</a> shooting on cheap disposable cameras, or on <a class="hover-photo-text"
+                            href="https://www.linkedin.com/in/sebastian-romerocruz/">LinkedIn</a> if you're more into that sort of thing.
+                    </p> -->
+                    <p id="contact">
+                        You can shoot me an <a class="hover-photo-text" href = "mailto: sebastianromerocruz@gmail.com">e-mail</a>, or find me on <a class="hover-photo-text"
                             href="https://www.linkedin.com/in/sebastian-romerocruz/">LinkedIn</a> if you're more into that sort of thing.
                     </p>
                     <p id="resume">
-                        You can also check my résumé out <span>here</span>.
+                        You can also check my résumé out <a class="hover-photo-text" href="/resources/cv.pdf">here</a>.
                     </p>
+
+                    <footer>
+                        <small class="footer-text">&copy; 2020 Sebastián Romero Cruz, <em class="footer-explanation" data-toggle="modal" data-target="#cabinetModal">Le Cabinet Historique</em>.</small>
+                    </footer>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="cabinetModal" tabindex="-1" role="dialog" aria-labelledby="cabinetModalTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="cabinetModalTitle">What is <em>Le Cabinet Historique</em> ?</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    A historical allusion. It's just the alias I use when working on projects, as a kind of motivator. The name is based on the <em>Cabinet Historique et Topographique Militaire</em>, a small, highly efficient
+                                    organization within the war ministry of the First French Republic, where Napoleon Bonaparte briefly worked in 1795. I like French history, that's it.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-lg-6">
                     <!-- Landing pictures -->
@@ -207,9 +252,6 @@
 
                     <!-- Education -->
                     <div class="education text-center d-none">
-                        <!-- <p class="click-text">click us!</p>
-                        <a class="btn btn-primary edu-button" data-toggle="collapse" href="#msc" role="button" aria-expanded="false" aria-controls="msc">master of science</a>
-                        <button class="btn btn-primary edu-button" type="button" data-toggle="collapse" data-target="#bsc" aria-expanded="false" aria-controls="bsc">bachelor of science</button> -->
                         <div class="row">
                             <div class="" id="msc">
                                 <div class="card card-body">
@@ -281,7 +323,7 @@
                     </div>
 
                     <!-- Maps -->
-                    <div class="map d-none">
+                    <div class="map text-center d-none">
                         <svg id="d3-map" width="440" height="600"></svg>
                     </div>
                 </div>
