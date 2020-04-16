@@ -4,7 +4,7 @@
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Overpass, Noto, and VT323 Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Overpass:400,700&display=swap" rel="stylesheet">
@@ -75,36 +75,25 @@
             </nav>
 
             <!-- Landing Page -->
-
-            <!-- Resume -->
-            <!-- <div class="">
-                Hello
-            </div> -->
-
-            <!-- Landing Page -->
             <div class="row">
-                <div class="col-lg-6 .d-flex .justify-content-center .align-items-center-center">
-                    <h1 id="title">Hi, I'm <span class="hover-photo-text" id="profile">Sebastián.</span></h1>
+                <div class="col-lg-6 .d-flex .justify-content-center .align-items-center-center" id="text">
+                    <h1 id="title">Hi, I'm <span onclick="location='#linked-to-text'" class="hover-photo-text" id="profile">Sebastián.</span></h1>
                     <p id="intro">
-                        I am a NYC-based professor and <span class="hover-photo-text" id="technical-skills">developer</span>.
+                        I am a NYC-based professor and <span onclick="location='#linked-to-text'" class="hover-photo-text" id="technical-skills">developer</span>.
                     </p>
                     <p id="vocation">
-                        I was born in <span class="hover-photo-text" id="mexico">Mexico City</span>, and later <span class="hover-photo-text" id="moved">moved</span> to New York, where I studied at <span class="hover-photo-text"
+                        I was born in <span onclick="location='#linked-to-text'" class="hover-photo-text" id="mexico">Mexico City</span>, and later <span onclick="location='#linked-to-text'" class="hover-photo-text" id="moved">moved</span> to New York, where I studied at <span onclick="location='#linked-to-text'" class="hover-photo-text"
                             id="education">NYU</span>.
                     </p>
                     <p id="explanation">
-                        Quantitative as my training may be, I like to be as creative in my work as I can, bringing in inspiration from as many fields as possible.
+                        Quantitative as my training may be, I like to be as creative in my work as I can, gravitating towards more interactive fields such <span onclick="location='#linked-to-text'" class="hover-photo-text">data visualisation</span>.
                     </p>
                     <p id="hobbies">
-                        Outside of work, some of my interests involve learning other <span class="hover-photo-text" id="japanese">languages</span>, music, and <span class="hover-photo-text" id="kyudo">kyūdō</span>.
+                        Outside of work, some of my interests involve learning other <span onclick="location='#linked-to-text'" class="hover-photo-text" id="japanese">languages</span>, music, and <span onclick="location='#linked-to-text'" class="hover-photo-text" id="kyudo">kyūdō</span>.
                     </p>
-                    <!-- <p id="contact">
-                        You can find me on <a class="hover-photo-text" href="https://www.instagram.com/ghstpkmn/">Instagram</a> shooting on cheap disposable cameras, or on <a class="hover-photo-text"
-                            href="https://www.linkedin.com/in/sebastian-romerocruz/">LinkedIn</a> if you're more into that sort of thing.
-                    </p> -->
                     <p id="contact">
                         You can shoot me an <a class="hover-photo-text" href = "mailto: sebastianromerocruz@gmail.com">e-mail</a>, or find me on <a class="hover-photo-text"
-                            href="https://www.linkedin.com/in/sebastian-romerocruz/">LinkedIn</a> if you're more into that sort of thing.
+                            href="https://www.linkedin.com/in/sebastian-romerocruz/">LinkedIn</a> if you woud like.
                     </p>
                     <p id="resume">
                         You can also check my résumé out <a class="hover-photo-text" href="/resources/cv.pdf">here</a>.
@@ -132,7 +121,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-6" id="linked-to-text">
                     <!-- Landing pictures -->
                     <div class="img-container text-center pt-5">
                         <img src="images/profile.jpg" alt="landing-picture" class="center-block landing-picture img-fluid">
@@ -286,7 +275,7 @@
                                     </div>
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item">
-                                            Bachelor of Sciece
+                                            Bachelor of Science
                                         </li>
                                         <li class="list-group-item">Tandon School of Engineering, <em>Class of 2017</em></li>
                                         <li class="list-group-item"><strong>GPA</strong>: 3.4</li>
@@ -302,7 +291,7 @@
                     <div class="japanese d-none">
                         <h1>Hi, I'm <span class="hover-photo-text">Sebastián.</span> 🇯🇵</h1>
                         <p class="japanese-text">
-                            NYCで、大学教授兼フロントエンド<span class="hover-photo-text japanese-text">開発者</span>として働いています。
+                            NYCで、大学教授兼<span class="hover-photo-text japanese-text">開発者</span>として働いています。
                         </p>
                         <p class="japanese-text">
                             私は<span class="hover-photo-text japanese-text">メキシコ</span>出身で、<span class="hover-photo-text japanese-text">ニューヨーク大学</span>において化学工学とコンピューター科学を、勉強しました。
@@ -324,7 +313,7 @@
 
                     <!-- Maps -->
                     <div class="map text-center d-none">
-                        <svg id="d3-map" width="440" height="600"></svg>
+                        <svg id="d3-map" width="440" height="550"></svg>
                     </div>
                 </div>
 
