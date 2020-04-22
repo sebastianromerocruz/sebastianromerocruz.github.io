@@ -10,7 +10,7 @@ var svg = d3.select("svg"),
 // Map and projection
 var projection = d3.geoMercator()
     .scale(550)
-    .translate([width * 2.5, height])
+    .translate([width * 2.6, height]);
 
 // A path generator
 var path = d3.geoPath()
@@ -190,7 +190,6 @@ function delta(path) {
 
             svg.select("#coords-text")
                 .text("[" + roundTo(coords[0], 5) + ", " + roundTo(coords[1], 5) + "]");
-            // projection(svg.select("#hello").attr("x"))
 
             var scale = Math.min(Math.sin(Math.PI * t) * 1.0, 1.0);
             return "translate(" + p.x + "," + p.y + ") scale(" + scale + ") rotate(" + rotation + ")";

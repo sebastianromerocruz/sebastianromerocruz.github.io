@@ -2,6 +2,11 @@ body {
     font-family: "Overpass";
 }
 
+body::after{
+   position:absolute; width:0; height:0; overflow:hidden; z-index:-1;
+   content:url(/images/kyudo.gif) url(/images/mexico.jpg) url(/images/profile.jpg) url(/images/nyu-logo.png);
+}
+
 /* Landing Page */
 h1, h2, h3, h4, h5, h6 {
     font-size: 1.75rem;
