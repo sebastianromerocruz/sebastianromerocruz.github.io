@@ -10,14 +10,14 @@ var svg = d3.select("svg"),
 // Map and projection
 var projection = d3.geoMercator()
     .scale(550)
-    .translate([width * 2.6, height]);
+    .translate([width * 2.6, height])
 
 // A path generator
 var path = d3.geoPath()
     .projection(projection)
 
 // Load world shape
-d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson", (data) => {
+d3.json("resources/countries.geo.json", (data) => {
 
     // Draw the map
     svg.append("g")

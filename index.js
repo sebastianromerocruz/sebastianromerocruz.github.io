@@ -19,7 +19,8 @@ const SKILL_BAR_PROGRESS = {
 const LISTENER_IDS = [
     "japanese",
     "education",
-    "technical-skills"
+    "technical-skills",
+    "map"
 ];
 
 const INSTRUMENT_BAR_PROGRESS = {
@@ -142,6 +143,9 @@ function addListeners() {
                 case "technical-skills":
                     activeElement = ActiveElement.SKILLS;
                     animateProgressBars(SKILL_BAR_PROGRESS, Animation.FILL);
+                    break;
+                case "map":
+                    activeElement = ActiveElement.MAP;
                     break;
             }
         }, () => {
