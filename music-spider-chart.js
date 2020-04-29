@@ -30,12 +30,14 @@ const tickRepresentation = {
     10: "Let's start a band"
 };
 
+const graphYOffset = 40;
+
 function angleToCoordinate(angle, value, scale) {
     let x = Math.cos(angle) * radialScale(value);
     let y = Math.sin(angle) * radialScale(value);
     return {
         "x": spiderWidth / 2 + x,
-        "y": spiderHeight / 2 - y
+        "y": spiderHeight / 2 - y - graphYOffset
     };
 }
 
@@ -62,7 +64,7 @@ function drawSpiderWeb(container) {
     ticks.forEach(t =>
         container.append("circle")
         .attr("cx", spiderWidth / 2)
-        .attr("cy", spiderHeight / 2)
+        .attr("cy", spiderHeight / 2 - graphYOffset)
         .attr("fill", "none")
         .attr("stroke", () => {
             return t === 10 ? "#010a43" : "#C0C0C0";
@@ -80,7 +82,7 @@ function drawSpiderWeb(container) {
         //draw axis line
         container.append("line")
             .attr("x1", spiderWidth / 2)
-            .attr("y1", spiderHeight / 2)
+            .attr("y1", spiderHeight / 2 - graphYOffset)
             .attr("x2", lineCoordinate.x)
             .attr("y2", lineCoordinate.y)
             .attr("stroke", "#010a43")
@@ -101,10 +103,10 @@ function drawSpiderWeb(container) {
             })
             .attr("y", () => {
                 if (labelCoordinate.y > spiderHeight / 2) {
-                    return labelCoordinate.y + (spiderHeight / 50);
+                    return labelCoordinate.y + (spiderHeight / 50) - graphYOffset;
                 }
 
-                return labelCoordinate.y - (spiderHeight / 60);
+                return labelCoordinate.y - (spiderHeight / 60) - graphYOffset;
             })
             .style('fill', '#010a43')
             .style('font-weight', 'bold')
@@ -154,7 +156,7 @@ function drawTickMarkLables(container) {
     ticks.forEach(t =>
         container.append("text")
         .attr("x", spiderWidth / 2 + 2.5)
-        .attr("y", spiderHeight / 2 - 1 - radialScale(t))
+        .attr("y", spiderHeight / 2 - 1 - radialScale(t) - graphYOffset)
         .attr("font-size", "0.5rem")
         .attr("fill", "#56476D")
         .attr("font-weight", "bold")
@@ -171,7 +173,7 @@ function addLabels(container) {
 
     container.append("text")
         .attr("x", 50)
-        .attr("y", spiderHeight - 50)
+        .attr("y", spiderHeight - graphYOffset - 50)
         .attr("font-size", "0.5rem")
         .attr("fill", "#010a43")
         .text("*Ranking based solely on self-perception, and not on any officially recognised qualification system.");
