@@ -162,6 +162,21 @@ function drawTickMarkLables(container) {
     );
 }
 
+function addLabels(container) {
+    container.append("text")
+        .attr("x", spiderWidth / 2 - 50)
+        .attr("y", 15)
+        .attr("font-size", "1rem")
+        .text("And how well?*");
+
+    container.append("text")
+        .attr("x", 50)
+        .attr("y", spiderHeight - 50)
+        .attr("font-size", "0.5rem")
+        .attr("fill", "#010a43")
+        .text("*Ranking based solely on self-perception, and not on any officially recognised qualification system.");
+}
+
 function addSpiderChartHoverListener(container) {
     $("#music").hover(() => {
         if (pageState === PageState.CLICK) {
@@ -190,6 +205,9 @@ function addSpiderChartHoverListener(container) {
 
         // Animate skill path
         animateSkillPath(skillPath);
+
+        // Add labels
+        addLabels(spiderSVG);
     }, () => {
         $(".landing-picture").first().removeClass("d-none");
         $(".education").first().addClass("d-none");
