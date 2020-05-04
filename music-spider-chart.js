@@ -165,12 +165,6 @@ function drawTickMarkLables(container) {
 }
 
 function addLabels(container) {
-    // container.append("text")
-    //     .attr("x", spiderWidth - 100)
-    //     .attr("y", 15)
-    //     .attr("font-size", "0.75rem")
-    //     .text("And how well?*");
-
     container.append("text")
         .attr("x", 50)
         .attr("y", spiderHeight - graphYOffset - 50)
