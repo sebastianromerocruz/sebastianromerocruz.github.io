@@ -103,10 +103,10 @@ function drawSpiderWeb(container) {
             })
             .attr("y", () => {
                 if (labelCoordinate.y > spiderHeight / 2) {
-                    return labelCoordinate.y + (spiderHeight / 50) - graphYOffset;
+                    return labelCoordinate.y + (spiderHeight / 50)　+ 5;
                 }
 
-                return labelCoordinate.y - (spiderHeight / 60) - graphYOffset;
+                return labelCoordinate.y - (spiderHeight / 60) + 5;
             })
             .style('fill', '#010a43')
             .style('font-weight', 'bold')
@@ -165,11 +165,11 @@ function drawTickMarkLables(container) {
 }
 
 function addLabels(container) {
-    container.append("text")
-        .attr("x", spiderWidth / 2 - 50)
-        .attr("y", 15)
-        .attr("font-size", "1rem")
-        .text("And how well?*");
+    // container.append("text")
+    //     .attr("x", spiderWidth - 100)
+    //     .attr("y", 15)
+    //     .attr("font-size", "0.75rem")
+    //     .text("And how well?*");
 
     container.append("text")
         .attr("x", 50)

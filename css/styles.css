@@ -143,7 +143,7 @@ p {
 /* MAPS */
 .countries {
     fill: #010a43;
-    /* fill: #2F2B5A; */
+
     stroke: #6cb0e0;
     stroke-width: 0.5px;
     stroke-linecap: round;
@@ -159,42 +159,39 @@ p {
 #d3-map {
     border-radius: 15px;
     font-family: 'VT323', monospace;
-    /* background-color: #107189; */
-    /* background-color: #8C6E88; */
     background-color: #56476D;
 }
 
 .plane {
-    /* fill: #a8e1bf; */
+
     fill: #FFC2C2;
 }
 
 .map-text {
-    /* fill: #a8e1bf; */
+
     fill: #FFC2C2;
     font-size: 0.7rem;
 }
 
 .map-screen {
-    /* fill: #56476D; */
-    /* fill: #010a43; */
+
     fill: #01072D;
 }
 
 .location-text {
-    /* fill: #a8e1bf; */
+
     fill: #FFC2C2;
     font-size: 1.5rem;
 }
 
 .city-text {
-    /* fill: #a8e1bf; */
+
     fill: #FFC2C2;
     font-size: 2rem;
 }
 
 .coords-text {
-    /* fill: #a8e1bf; */
+
     fill: #FFC2C2;
     font-size: 0.625rem;
 }
