@@ -147,7 +147,7 @@ p {
 /* MAPS */
 .countries {
     fill: #010a43;
-
+    /* fill: #FFC2C2; */
     stroke: #6cb0e0;
     stroke-width: 0.5px;
     stroke-linecap: round;
@@ -156,47 +156,55 @@ p {
 }
 
 .airports {
-    /* fill: #a8e1bf; */
+    /* fill: #010a43; */
     fill: #FFC2C2;
 }
 
 #d3-map {
     border-radius: 15px;
     font-family: 'VT323', monospace;
-    background-color: #56476D;
+    background-color: rgba(86, 71, 109, 1);
+    /* border: solid #010a43; */
+    margin-left: 10;
 }
 
 .plane {
-
+    /* fill: #56476D; */
     fill: #FFC2C2;
+    /* fill: #010a43; */
 }
 
 .map-text {
 
+    /* fill: #010a43; */
     fill: #FFC2C2;
     font-size: 0.7rem;
 }
 
 .map-screen {
 
-    fill: #01072D;
+    /* fill: #010a43; */
+    fill: #FFC2C2;
 }
 
 .location-text {
 
-    fill: #FFC2C2;
+    /* fill: #FFC2C2; */
+    fill: #010a43;
     font-size: 1.5rem;
 }
 
 .city-text {
 
-    fill: #FFC2C2;
+    /* fill: #FFC2C2; */
+    fill: #010a43;
     font-size: 2rem;
 }
 
 .coords-text {
 
-    fill: #FFC2C2;
+    /* fill: #FFC2C2; */
+    fill: #010a43;
     font-size: 0.625rem;
 }
 
