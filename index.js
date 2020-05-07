@@ -20,7 +20,10 @@ const LISTENER_IDS = [
     "japanese",
     "education",
     "technical-skills",
-    "map"
+    "map",
+    "professor",
+    "skandinaviska",
+    "pitchfork"
 ];
 
 const INSTRUMENT_BAR_PROGRESS = {
@@ -50,7 +53,10 @@ var ActiveElement = {
     SKILLS: 2,
     MAP: 3,
     EDUCATION: 4,
-    LANGUAGES: 5
+    LANGUAGES: 5,
+    PROFESSOR: 6,
+    SKANDINAVISKA: 7,
+    PITCHFORK: 8
 }
 
 var currentLanguage = Language.ENGLISH;
@@ -118,6 +124,21 @@ function disablePreviousActiveElement(previousActiveElement) {
             $(".japanese").first().addClass("d-none");
             activeElement = ActiveElement.LANDING;
             break;
+        case ActiveElement.PROFESSOR:
+            $(".img-container").first().removeClass("d-none");
+            $(".professor").first().addClass("d-none");
+            activeElement = ActiveElement.LANDING;
+            break;
+        case ActiveElement.SKANDINAVISKA:
+            $(".img-container").first().removeClass("d-none");
+            $(".skandinaviska").first().addClass("d-none");
+            activeElement = ActiveElement.LANDING;
+            break;
+        case ActiveElement.PITCHFORK:
+            $(".img-container").first().removeClass("d-none");
+            $(".pitchfork").first().addClass("d-none");
+            activeElement = ActiveElement.LANDING;
+            break;
     }
 }
 
@@ -146,6 +167,15 @@ function addListeners() {
                     break;
                 case "map":
                     activeElement = ActiveElement.MAP;
+                    break;
+                case "professor":
+                    activeElement = ActiveElement.PROFESSOR;
+                    break;
+                case "skandinaviska":
+                    activeElement = ActiveElement.SKANDINAVISKA;
+                    break;
+                case "pitchfork":
+                    activeElement = ActiveElement.PITCHFORK;
                     break;
             }
         }, () => {

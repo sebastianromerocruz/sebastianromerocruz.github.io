@@ -101,13 +101,6 @@ d3.json("resources/countries.geo.json", (data) => {
         .attr("id", "hello")
         .text("15 YEARS AGO...")
 
-    // svg.append("text")
-    //     .attr("class", "map-text")
-    //     .attr("x", 10)
-    //     .attr("y", height - 20)
-    //     .attr("id", "hello")
-    //     .text("MADE WITH D3.JS")
-
     const mapTextX = 60;
     const mapTextY = 170;
 

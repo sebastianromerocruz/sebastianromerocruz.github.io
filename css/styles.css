@@ -75,7 +75,7 @@ p {
 }
 
 .ranking {
-    font-size: 1rem;
+    font-size: 0.75rem;
     color: #C0C0C0;
     margin-bottom: 0;
 }
@@ -210,6 +210,27 @@ p {
 
 .route {
     opacity: 0;
+}
+
+.exp-card-header {
+    background-color: #fff;
+    color: #C0C0C0;
+    border: 0;
+    padding-bottom: 0;
+}
+
+.exp-card-title {
+    padding-top: 0;
+}
+
+.exp-dates {
+    font-size: 1rem;
+    color: #C0C0C0;
+    margin-bottom: 0;
+}
+
+.exp-logo {
+    margin-right: 20px;
 }
 
 .footer-text {
