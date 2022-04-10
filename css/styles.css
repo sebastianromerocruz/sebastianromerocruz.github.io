@@ -24,6 +24,10 @@ p {
     line-height: 1.5;
 }
 
+.card-text {
+    margin: 0px;
+}
+
 .japanese-text {
     font-family: 'Noto Sans JP', sans-serif;
     font-size: 1.45rem;
@@ -141,7 +145,7 @@ p {
 }
 
 .nyu-logo {
-    width: 75%;
+    width: 60%;
 }
 
 /* MAPS */

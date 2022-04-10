@@ -5,7 +5,7 @@ const HOVER_PICTURES = [
 ];
 
 const SKILL_BAR_PROGRESS = {
-    "python-bar": "90%",
+    "python-bar": "100%",
     "html-bar": "70%",
     "css-bar": "60%",
     "js-bar": "80%",
@@ -234,15 +234,16 @@ function main() {
     addListeners();
 }
 
-$(document).ready(() => {
-
-    // Quick preliminary check to see if user's screen is under the current functioning threshold
-    if (document.documentElement.clientWidth < MOBILE_WINDOW_SIZE_THRESHOLD) {
-
-        // Activate modal for explanation if so, and set settings to MOBILE
-        $('#mobileModal').modal('show');
-        currentWindowSize = WindowSize.MOBILE;
-    }
-
-    main();
-});
+// $(document).ready(() => {
+//
+//     // Quick preliminary check to see if user's screen is under the current functioning threshold
+//     if (document.documentElement.clientWidth < MOBILE_WINDOW_SIZE_THRESHOLD) {
+//
+//         // Activate modal for explanation if so, and set settings to MOBILE
+//         $('#mobileModal').modal('show');
+//         currentWindowSize = WindowSize.MOBILE;
+//     }
+//
+//     main();
+// });
+main();
