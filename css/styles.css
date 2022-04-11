@@ -144,8 +144,12 @@ p {
     font-size: 1.5rem;
 }
 
+.work-logo {
+    width: 40%;
+}
+
 .nyu-logo {
-    width: 60%;
+    width: 74%;
 }
 
 /* MAPS */
