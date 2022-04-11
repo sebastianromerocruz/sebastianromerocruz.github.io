@@ -6,14 +6,14 @@ const HOVER_PICTURES = [
 
 const SKILL_BAR_PROGRESS = {
     "python-bar": "100%",
-    "html-bar": "70%",
-    "css-bar": "60%",
+    "swift-bar": "50%",
+    "rust-bar": "20%",
     "js-bar": "80%",
     "java-bar": "90%",
-    "c-sharp-bar": "80%",
-    "bootstrap-bar": "70%",
-    "jquery-bar": "70%",
-    "d3-bar": "85%"
+    "cpp-bar": "45%",
+    "react-bar": "40%",
+    "opengl-bar": "55%",
+    "d3-bar": "30%"
 };
 
 const LISTENER_IDS = [

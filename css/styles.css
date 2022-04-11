@@ -97,12 +97,12 @@ p {
     background-color: #306998;
 }
 
-.html-bar {
-    background-color: #F16529;
+.swift-bar {
+    background-color: #f05138;
 }
 
-.css-bar {
-    background-color: #264de4;
+.rust-bar {
+    background-color: #CE422B;
 }
 
 .js-bar {
@@ -113,15 +113,15 @@ p {
     background-color: #ED8B00;
 }
 
-.c-sharp-bar {
-    background-color: #800080;
+.cpp-bar {
+    background-color: #5E97D0;
 }
 
-.bootstrap-bar {
-    background-color: #602c50;
+.react-bar {
+    background-color: #61DBFB;
 }
 
-.jquery-bar {
+.opengl-bar {
     background-color: #0868AC;
 }
 
