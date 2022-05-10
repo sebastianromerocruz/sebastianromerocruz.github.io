@@ -1,52 +1,48 @@
-const d = {
+const INSTRUMENT_PROFICIENCY = {
     "Bass": 9.5,
     "Guitar": 8.0,
     "Ukulele": 7.0,
     "Piano": 7.5,
     "Drums": 4
 };
-
-const dOrigin = {
+const INSTRUMENT_ORIGIN = {
     "Bass": 0.0,
     "Guitar": 0.0,
     "Ukulele": 0.0,
     "Piano": 0.0,
     "Drums": 0.0
 };
-
-const features = Object.keys(d);
-const spiderWidth = 500;
-const spiderHeight = 500;
-
-const radialScale = d3.scaleLinear()
+const INSTRUMENT_FEATURES = Object.keys(INSTRUMENT_PROFICIENCY);
+const SPIDER_WIDTH = 500,
+      SPIDER_HEIGHT = 500;
+const RADIAL_SCALE = d3.scaleLinear()
     .domain([0, 10])
     .range([0, 167]);
-const ticks = [2, 4, 6, 8, 10];
-const tickRepresentation = {
+const TICKS = [2, 4, 6, 8, 10];
+const TICK_TAGS = {
     2: "Not very good",
     4: "Alright",
     6: "Decent",
     8: "Pretty comfortable",
     10: "Let's start a band"
 };
-
-const graphYOffset = 40;
+const Y_OFFSET = 40;
 
 function angleToCoordinate(angle, value, scale) {
-    let x = Math.cos(angle) * radialScale(value);
-    let y = Math.sin(angle) * radialScale(value);
+    let x = Math.cos(angle) * RADIAL_SCALE(value);
+    let y = Math.sin(angle) * RADIAL_SCALE(value);
     return {
-        "x": spiderWidth / 2 + x,
-        "y": spiderHeight / 2 - y - graphYOffset
+        "x": SPIDER_WIDTH / 2 + x,
+        "y": SPIDER_HEIGHT / 2 - y - Y_OFFSET
     };
 }
 
 function getPathCoordinates(dataPoint) {
-    var coordinates = [];
-    var source = 0;
-    for (var i = 0; i < features.length; i++) {
-        var featureName = features[i];
-        var angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
+    let coordinates = [];
+    let source = 0;
+    for (let i = 0; i < INSTRUMENT_FEATURES.length; i++) {
+        let featureName = INSTRUMENT_FEATURES[i];
+        let angle = (Math.PI / 2) + (2 * Math.PI * i / INSTRUMENT_FEATURES.length);
 
         if (i === 0) {
             source = angle;
@@ -55,34 +51,34 @@ function getPathCoordinates(dataPoint) {
         coordinates.push(angleToCoordinate(angle, dataPoint[featureName]));
     }
 
-    coordinates.push(angleToCoordinate(source, dataPoint[features[0]]));
+    coordinates.push(angleToCoordinate(source, dataPoint[INSTRUMENT_FEATURES[0]]));
 
     return coordinates;
 }
 
 function drawSpiderWeb(container) {
-    ticks.forEach(t =>
+    TICKS.forEach(t =>
         container.append("circle")
-        .attr("cx", spiderWidth / 2)
-        .attr("cy", spiderHeight / 2 - graphYOffset)
+        .attr("cx", SPIDER_WIDTH / 2)
+        .attr("cy", SPIDER_HEIGHT / 2 - Y_OFFSET)
         .attr("fill", "none")
         .attr("stroke", () => {
             return t === 10 ? "#010a43" : "#C0C0C0";
         })
         .attr("stroke-width", 2)
-        .attr("r", radialScale(t))
+        .attr("r", RADIAL_SCALE(t))
     );
 
-    for (var i = 0; i < features.length; i++) {
-        var featureName = features[i];
-        var angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
-        var lineCoordinate = angleToCoordinate(angle, 10);
-        var labelCoordinate = angleToCoordinate(angle, 10.50);
+    for (let i = 0; i < INSTRUMENT_FEATURES.length; i++) {
+        let featureName = INSTRUMENT_FEATURES[i];
+        let angle = (Math.PI / 2) + (2 * Math.PI * i / INSTRUMENT_FEATURES.length);
+        let lineCoordinate = angleToCoordinate(angle, 10);
+        let labelCoordinate = angleToCoordinate(angle, 10.50);
 
         //draw axis line
         container.append("line")
-            .attr("x1", spiderWidth / 2)
-            .attr("y1", spiderHeight / 2 - graphYOffset)
+            .attr("x1", SPIDER_WIDTH / 2)
+            .attr("y1", SPIDER_HEIGHT / 2 - Y_OFFSET)
             .attr("x2", lineCoordinate.x)
             .attr("y2", lineCoordinate.y)
             .attr("stroke", "#010a43")
@@ -91,22 +87,22 @@ function drawSpiderWeb(container) {
         //draw axis label
         container.append("text")
             .attr("x", () => {
-                // TODO: FIX X POSITION OF TEXT TO BE VARIABLE
+                // TODO: FIX X POSITION OF TEXT TO BE letIABLE
 
-                if (labelCoordinate.x > spiderWidth / 2) {
-                    return labelCoordinate.x + (spiderWidth / 100);
-                } else if (labelCoordinate.x < spiderWidth / 2) {
-                    return labelCoordinate.x - (spiderWidth / 10);
+                if (labelCoordinate.x > SPIDER_WIDTH / 2) {
+                    return labelCoordinate.x + (SPIDER_WIDTH / 100);
+                } else if (labelCoordinate.x < SPIDER_WIDTH / 2) {
+                    return labelCoordinate.x - (SPIDER_WIDTH / 10);
                 }
 
                 return labelCoordinate.x - 10;
             })
             .attr("y", () => {
-                if (labelCoordinate.y > spiderHeight / 2) {
-                    return labelCoordinate.y + (spiderHeight / 50)　+ 5;
+                if (labelCoordinate.y > SPIDER_HEIGHT / 2) {
+                    return labelCoordinate.y + (SPIDER_HEIGHT / 50) + 5;
                 }
 
-                return labelCoordinate.y - (spiderHeight / 60) + 5;
+                return labelCoordinate.y - (SPIDER_HEIGHT / 60) + 5;
             })
             .style('fill', '#010a43')
             .style('font-weight', 'bold')
@@ -115,14 +111,14 @@ function drawSpiderWeb(container) {
 }
 
 function getSkillPath(container) {
-    var line = d3.line()
+    let line = d3.line()
         .x(d => d.x)
         .y(d => d.y);
-    var spiderColour = "#ffc2c2";
-    var spiderBorderColour = "#56476D";
+    let spiderColour = "#ffc2c2";
+    let spiderBorderColour = "#56476D";
 
-    let coordinatesZero = getPathCoordinates(dOrigin);
-    let coordinates = getPathCoordinates(d);
+    let coordinatesZero = getPathCoordinates(INSTRUMENT_ORIGIN);
+    let coordinates = getPathCoordinates(INSTRUMENT_PROFICIENCY);
 
     //draw the path element
     let spiderPath = container.append("path")
@@ -153,21 +149,21 @@ function animateSkillPath(path) {
 }
 
 function drawTickMarkLables(container) {
-    ticks.forEach(t =>
+    TICKS.forEach(t =>
         container.append("text")
-        .attr("x", spiderWidth / 2 + 2.5)
-        .attr("y", spiderHeight / 2 - 1 - radialScale(t) - graphYOffset)
+        .attr("x", SPIDER_WIDTH / 2 + 2.5)
+        .attr("y", SPIDER_HEIGHT / 2 - 1 - RADIAL_SCALE(t) - Y_OFFSET)
         .attr("font-size", "0.5rem")
         .attr("fill", "#56476D")
         .attr("font-weight", "bold")
-        .text(" ↙ " + tickRepresentation[t])
+        .text(" ↙ " + TICK_TAGS[t])
     );
 }
 
 function addLabels(container) {
     container.append("text")
         .attr("x", 50)
-        .attr("y", spiderHeight - graphYOffset - 50)
+        .attr("y", SPIDER_HEIGHT - Y_OFFSET - 50)
         .attr("font-size", "0.5rem")
         .attr("fill", "#010a43")
         .text("*Ranking based solely on self-perception, and not on any officially recognised qualification system.");
@@ -186,9 +182,9 @@ function addSpiderChartHoverListener(container) {
         $(".map").first().addClass("d-none");
         $(".music").first().removeClass("d-none");
 
-        var spiderSVG = d3.select("#d3-spider")
-            .attr("width", spiderWidth)
-            .attr("height", spiderHeight);
+        let spiderSVG = d3.select("#d3-spider")
+            .attr("width", SPIDER_WIDTH)
+            .attr("height", SPIDER_HEIGHT);
 
         // Draw spider web
         drawSpiderWeb(spiderSVG);
@@ -197,7 +193,7 @@ function addSpiderChartHoverListener(container) {
         drawTickMarkLables(spiderSVG);
 
         // Get spider skill path
-        var skillPath = getSkillPath(spiderSVG)
+        let skillPath = getSkillPath(spiderSVG)
 
         // Animate skill path
         animateSkillPath(skillPath);
