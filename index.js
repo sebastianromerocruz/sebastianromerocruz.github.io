@@ -7,7 +7,7 @@ const HOVER_PICTURES = [
 const SKILL_BAR_PROGRESS = {
     "python-bar": "100%",
     "swift-bar": "50%",
-    "rust-bar": "20%",
+    "mos6502-bar": "20%",
     "js-bar": "80%",
     "java-bar": "90%",
     "cpp-bar": "45%",
