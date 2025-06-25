@@ -104,7 +104,7 @@ d3.json("resources/countries.geo.json", (data) => {
         .attr("x", 10)
         .attr("y", 20)
         .attr("id", "hello")
-        .text("17 YEARS AGO...")
+        .text("25 YEARS AGO...")
 
 
     svg.append("rect")
