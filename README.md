@@ -1,4 +1,4 @@
-# Building Sebastián's Personal Site — A Complete Programming Walkthrough
+# Building A Personal Site — A Complete Programming Walkthrough
 
 This guide explains how to build this site from scratch, in the order you would actually write it. Every design decision, algorithm, and technique is explained. No prior knowledge of D3 or calendar arithmetic is assumed.
 
