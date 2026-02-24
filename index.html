@@ -1,478 +1,604 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+<!--
+  index.html
+  Personal site — Soft Glitch-Core Dieter Rams / Bauhaus aesthetic
 
+  File structure:
+    index.html      ← this file
+    style.css       ← all styles
+    main.js         ← French Republican calendar, panel switching, D3 flight
+    assets/
+      portrait.jpg  ← main profile photo (default right panel)
+      cdmx.jpg      ← childhood photo (Mexico City panel)
+      kyudo.gif     ← kyūdō practice gif/video (kyūdō panel)
+
+  Layout:
+    Two equal columns filling the viewport (CSS grid, no scroll).
+    Left  — biography with hoverable words that trigger right-panel swaps.
+    Right — panels stacked via position:absolute; only one is visible at a time.
+
+  Panels (right column), keyed by data-panel attribute on .hl words:
+    panel-default   — portrait photo; shown when nothing is hovered
+    panel-professor — courses taught
+    panel-developer — programming language proficiency (chip treatment)
+    panel-mexico    — childhood photo from Mexico City
+    panel-moved     — D3 animated flight path CDMX to NYC
+    panel-nyu       — degrees from NYU Tandon
+    panel-music     — instrument proficiency (chip treatment)
+    panel-kyudo     — kyudo panel with gif and concentric target rings
+    panel-contact   — GitHub, LinkedIn, email
+    panel-lang-ja   — bio in Japanese
+    panel-lang-cs   — bio in Czech
+    panel-lang-la   — bio in Classical Latin
+-->
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sebastián</title>
 
-    <!-- Overpass, Noto, and VT323 Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Overpass:400,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <!-- Fonts: IBM Plex Sans (body) + IBM Plex Mono (labels, captions, indices) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&family=IBM+Plex+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet"
+  />
 
-    <!-- Font Awesome -->
-    <script src="https://kit.fontawesome.com/133d39255b.js" crossorigin="anonymous"></script>
+  <!-- Site styles -->
+  <link rel="stylesheet" href="style.css" />
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/styles.css">
-
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script> -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-
-    <title>Sebastián Romero Cruz</title>
+  <!--
+    D3 v7 — loaded in head so it is available when main.js runs.
+    Used only for the flight animation (panel-moved).
+  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 </head>
 
 <body>
-    <section id="main">
-        <div class="container-fluid">
-
-            <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-light">
-                <!-- Brand -->
-                <a class="navbar-brand" onClick="window.location.reload();"><i class="site-logo fas fa-ghost"></i></a>
-            </nav>
-
-            <!-- Mobile Size Window Modal -->
-            <div class="modal fade" id="mobileModal" tabindex="-1" role="dialog" aria-labelledby="mobileModalTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="mobileModalTitle">Welcome!</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            Thanks for checking my personal site out. I see that you're either on mobile, or your screen size is on the smaller side. I'm currently optimizing to make this site work and respond well on mobile-sized /
-                            smaller screens, so it may not look its best at the moment. Still, I encourage you to check it out on larger screen sizes, and to check-in in the future for updates.
-                        </div>
-                        <div class="modal-footer">
-                            —<em>Sebastián</em>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Landing Page -->
-            <div class="row">
-                <div class="col-lg-6 .d-flex .justify-content-center .align-items-center-center" id="text">
-                    <h1 id="title">Hi, I'm Sebastián.</h1>
-                    <p id="intro">
-                        I am a NYC-based <span onclick="location='#linked-to-text'" class="hover-photo-text"
-                            id="professor">computer science professor</span> and <span onclick="location='#linked-to-text'" class="hover-photo-text" id="technical-skills">developer</span>.
-                    </p>
-                    <p id="vocation">
-                        I was born in <span onclick="location='#linked-to-text'" class="hover-photo-text" id="mexico">Mexico City</span>, and later <span onclick="location='#linked-to-text'" class="hover-photo-text" id="moved">moved</span> to New
-                        York, where I studied at <span onclick="location='#linked-to-text'" class="hover-photo-text" id="education">NYU</span>.
-                    </p>
-                    <p id="explanation">
-                        Although I mostly deal in <a class="hover-photo-text" href="https://github.com/sebastianromerocruz/CS1114-problem-solving-and-programming?tab=readme-ov-file#cs-uy-1114-material">the</a> <a class="hover-photo-text" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material">intro</a><a class="hover-photo-text" href="https://github.com/sebastianromerocruz/CS122-object-oriented-programming?tab=readme-ov-file#cs-122-computer-programming-ii">ductory</a> and <a class="hover-photo-text" href="https://github.com/sebastianromerocruz/CS3113-intro-to-game-programming?tab=readme-ov-file#cs3113-introduction-to-game-programming">video</a> <a class="hover-photo-text" href="https://github.com/sebastianromerocruz/game-programming-in-assembly?tab=readme-ov-file#october-13th-2022">game</a> programming pedagogy space, I also have experience in <span class="hover-photo-text" id="skandinaviska">other</span> <span class="hover-photo-text"
-                            id="pitchfork">areas</span> of computer science.
-                    </p>
-                    <p id="hobbies">
-                        Outside of work, some of my interests involve learning foreign <span onclick="location='#linked-to-text'" class="hover-photo-text" id="japanese">languages</span>, <span onclick="location='#linked-to-text'"
-                            class="hover-photo-text" id="music">music</span>, and <span onclick="location='#linked-to-text'" class="hover-photo-text" id="kyudo">kyūdō</span>.
-                    </p>
-                    <p id="contact">
-                        You can find me on <a class="hover-photo-text" href="https://github.com/sebastianromerocruz">GitHub</a> if you
-                        would like to check out my work.
-                    </p>
-                    <p id="resume">
-                        You can also find me on LinkedIn <a class="hover-photo-text" href="https://www.linkedin.com/in/sebastian-romerocruz/">here</a>, or shoot me an <a class="hover-photo-text" href="mailto: s.romerocruz@proton.com">e-mail</a> if you'd prefer.
-                    </p>
-
-                    <footer>
-                        <small class="footer-text">&copy; 2025 Sebastián Romero Cruz
-                            <!-- , <em class="footer-explanation" data-toggle="modal" data-target="#cabinetModal">Le Cabinet Historique</em>. -->
-                        </small>
-                    </footer>
-
-                    <!-- Modal -->
-                    <div class="modal fade" id="cabinetModal" tabindex="-1" role="dialog" aria-labelledby="cabinetModalTitle" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="cabinetModalTitle">What is <em>Le Cabinet Historique</em> ?</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    This is literally just the alias I use when working on projects, as a kind of motivator. The name is based on the <em>Cabinet Historique et Topographique Militaire</em>, a small, highly efficient
-                                    organization within the war ministry of the First French Republic, where Napoleon Bonaparte briefly worked in 1795. I like French history, that's it.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6" id="linked-to-text">
-                    <!-- Landing pictures -->
-                    <div class="img-container text-center pt-5">
-                        <img src="images/profile.jpg" alt="landing-picture" class="center-block landing-picture img-fluid">
-                    </div>
+<div class="site">
 
 
-                    <!-- Progress bar stuff -->
-                    <div class="container-fluid technical-skills d-none">
-                        <h3>Technical Skills</h3>
-                        <hr>
-                        <p>Languages</p>
-                        <div class="row">
-                            <div class="col-sm-2"></div>
-                            <div class="col-sm-10">
-                                <div class="row">
-                                    <div class="col-sm-4">
-                                        <p class="ranking text-left">playing with it</p>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <p class="ranking text-center">i can teach it</p>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <p class="ranking text-right">fluent</p>
-                                    </div>
-                                </div>
-                                <hr class="ranking-rule">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-2"><i class="fab fa-python fa-2x skill-logo"></i></div>
-                            <div class="col-sm-10">
-                                <div class="progress">
-                                    <div class="progress-bar python-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">python</div>
-                                </div>
-                            </div>
-                        </div>
+  <!-- ====================================================================
+       LEFT COLUMN — Biography
+       The static half. Contains the name, bio paragraphs, Republican date,
+       and footer links. Hovering .hl words swaps the right panel.
+       ==================================================================== -->
+  <div class="left">
 
-                        <div class="row">
-                            <div class="col-sm-2"><i class="fab fa-java fa-2x skill-logo"></i></div>
-                            <div class="col-sm-10">
-                                <div class="progress">
-                                    <div class="progress-bar java-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">java</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-2">
-                                <p class="skill-logo">C++</p>
-                            </div>
-                            <div class="col-sm-10">
-                                <div class="progress">
-                                    <div class="progress-bar cpp-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">C++</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-2">
-                                <!-- <i class="fab fa-swift fa-2x skill-logo"></i> -->
-                                <p class="skill-logo">C#</p>
-                            </div>
-                            <div class="col-sm-10">
-                                <div class="progress">
-                                    <div class="progress-bar swift-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">C#</div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- <div class="row">
-                            <div class="col-sm-2"><i class="fab fa-js-square fa-2x skill-logo"></i></div>
-                            <div class="col-sm-10">
-                                <div class="progress">
-                                    <div class="progress-bar js-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">javascript</div>
-                                </div>
-                            </div>
-                        </div> -->
-                        <!-- <div class="row">
-                            <div class="col-sm-2"><p class="skill-logo">ASM</p></i></div>
-                            <div class="col-sm-10">
-                                <div class="progress">
-                                    <div class="progress-bar mos6502-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">6502 asm</div>
-                                </div>
-                            </div>
-                        </div> -->
-                        <hr>
-                        <p>Frameworks and Libraries</p>
-                        <div class="row">
-                            <div class="col-sm-2">
-                                <p class="skill-logo">OpenGL</p>
-                            </div>
-                            <div class="col-sm-10">
-                                <div class="progress">
-                                    <div class="progress-bar opengl-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">opengl</div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- <div class="row">
-                            <div class="col-sm-2"><i class="fab fa-react fa-2x skill-logo"></i></div>
-                            <div class="col-sm-10">
-                                <div class="progress">
-                                    <div class="progress-bar react-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">react</div>
-                                </div>
-                            </div>
-                        </div> -->
+    <!-- Section index strip: label + extending hairline rule -->
+    <div class="left-index">
+      <span class="left-index-label">01 / README.md</span>
+      <div class="left-index-rule"></div>
+    </div>
 
-                        <div class="row">
-                            <div class="col-sm-2">
-                                <p class="skill-logo">Unity</p>
-                            </div>
-                            <div class="col-sm-10">
-                                <div class="progress">
-                                    <div class="progress-bar d3-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">Unity</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <!--
+      Name heading.
+      The trailing period is wrapped in <em> and coloured red in CSS
+      — the only purely decorative element on the left side.
+    -->
+    <h1 class="name-heading">Sebasti&#225;n<em>.</em></h1>
 
-                    <!-- Education -->
-                    <div class="education text-center d-none">
-                        <div class="row">
-                            <div class="" id="msc">
-                                <div class="card card-body">
-                                    <div class="edu-header row align-items-center">
-                                        <div class="col-4">
-                                            <img src="images/nyu-logo.png" class="card-img-top nyu-logo rounded mx-auto d-block" alt="nyu-logo">
-                                        </div>
-                                        <div class="col-8">
-                                            <h5 class="card-title">Computer Science</h5>
-                                        </div>
-                                    </div>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">
-                                            Master of Science
-                                        </li>
-                                        <li class="list-group-item">Tandon School of Engineering, <em>Class of 2020</em></li>
-                                        <li class="list-group-item"><strong>GPA</strong>: 3.8</li>
-                                    </ul>
 
-                                </div>
+    <!--
+      Bio paragraphs.
 
-                            </div>
-                            <div class="" id="bsc">
-                                <div class="card card-body">
-                                    <div class="row align-items-center">
-                                        <div class="col-4">
-                                            <img src="images/nyu-logo.png" class="card-img-top nyu-logo rounded mx-auto d-block" alt="nyu-logo">
-                                        </div>
-                                        <div class="col-8">
-                                            <h5 class="card-title">Chemical and Biomolecular Engineering</h5>
-                                        </div>
-                                    </div>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">
-                                            Bachelor of Science
-                                        </li>
-                                        <li class="list-group-item">Tandon School of Engineering, <em>Class of 2017</em></li>
-                                        <li class="list-group-item"><strong>GPA</strong>: 3.4</li>
-                                    </ul>
+      .hl words — hoverable, trigger panel swap via data-panel attribute.
+                  Styled with a dotted red underline; solid red when active.
 
-                                </div>
+      .bio-link  — regular hyperlinks (GitHub repos). Same visual style as
+                   .hl but use <a> tags and open in a new tab.
 
-                            </div>
-                        </div>
-                    </div>
+      Paragraph breakdown:
+        1. Intro: role and location
+        2. Work scope: teaching focus + links to repos
+        3. Interests: languages, music, kyudo
+        4. Contact: GitHub, LinkedIn, email
+    -->
+    <p class="bio">
+      I am a Brooklyn-based computer science
+      <span class="hl" data-panel="professor">professor</span>
+      and <span class="hl" data-panel="developer">programmer</span>.
+      I was born in <span class="hl" data-panel="mexico">Mexico City</span>,
+      and later <span class="hl" data-panel="moved">moved</span> to New York,
+      where I studied at <span class="hl" data-panel="nyu">NYU</span>.
+    </p>
 
-                    <!-- <div class="experience d-none"> -->
-                    <div id="experience-professor" class="professor d-none text-center">
-                        <div class="row">
-                            <div class="" id="msc">
-                                <div class="card card-body">
-                                    <div class="edu-header row align-items-center">
-                                        <div class="col-4">
-                                            <img src="images/nyu-logo.png" class="card-img-top workplace-logo rounded mx-auto d-block" alt="nyu-logo">
-                                        </div>
-                                        <div class="col-8">
-                                            <h5 class="card-title">New York University</h5>
-                                        </div>
-                                    </div>
-                                    <span class="card-subtitle" style="font-weight: bold; font-style: italic; display: block;">
-                                                Industry Assistant Professor
-                                            </span>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">
-                                            <span class="card-text" style="font-style: italic; font-size: 1.0rem; display: block;">
-                                                Introduction to Problem Solving and Programming with Python
-                                            </span>
-                                            <span style="font-size: 0.80rem;">
-                                                Instructed over 7 sections covering foundational concepts in Python, including control flow, functional decomposition, and data structures through hands-on labs and real-world engineering examples
-                                                <span>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <span class="card-text" style="font-style: italic; font-size: 1.0rem; display: block;">
-                                                Introduction to Game Programming
-                                            </span>
-                                            <span style="font-size: 0.80rem;">
-                                                Designed and delivered a project-based Intro to Game Programming curriculum in C++ and OpenGL, teaching game engine essentials such as transformations, physics, and shader programming across 10 semesters.
-                                                <span>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <span class="card-text" style="font-style: italic; font-size: 1.0rem; display: block;">
-                                                Data Structures and Algorithms
-                                            </span>
-                                            <span style="font-size: 0.80rem;">
-                                                Instructed the department's second core course, covering asymptotic analysis, searching algorithms, recursions, and foundational data structures such as array lists (including stacks and queues), linked lists, trees, maps, hash tables and priority queues.
-                                            <span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <!-- <div class="" id="bsc">
-                                <div class="card card-body">
-                                    <div class="row align-items-center">
-                                        <div class="col-4">
-                                            <img src="images/pace_logo.gif" class="card-img-top workplace-logo rounded mx-auto d-block" alt="pace-logo">
-                                        </div>
-                                        <div class="col-8">
-                                            <h5 class="card-title">Pace University</h5>
-                                        </div>
-                                    </div>
-                                    <span class="card-subtitle" style="font-weight: bold; font-style: italic; display: block;">
-                                                Adjunct Professor (2021 - 2025)
-                                            </span>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">
-                                            <span class="card-text" style="font-weight: bold; font-style: italic; display: block;">
-                                                Introduction to Computer Science with Java
-                                            </span>
-                                            <span style="font-size: 0.75rem;">
-                                                Instructing the fundamentals of programming, covering control flow structures, class inheritance, interfaces and polymorphism, the Java collection framework data types, and sorting and searching algorithms.
-                                                <span>
-                                        </li>
-                                        <li class="list-group-item">
-                                            <span class="card-text" style="font-weight: bold; font-style: italic; display: block;">
-                                                Introduction to Computing
-                                            </span>
-                                            <span style="font-size: 0.75rem;">
-                                                Instructing 3 lecture sections across a total of 94 non-computer science students on MS Excel data management including pivot tables, What-If analyses, and data visualization methodology.
-                                                <span>
-                                        </li>
-                                    </ul>
-                                </div>
+    <p class="bio">
+      Although I mostly deal in the
+      <a class="bio-link" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material" target="_blank">introductory</a>
+      and <a class="bio-link" href="https://github.com/sebastianromerocruz/CS3113-Intro-To-Game-Programming?tab=readme-ov-file#cs-uy-3113-introduction-to-game-programming" target="_blank">video game programming</a>
+      pedagogy space, I also have experience in other areas of
+      <a class="bio-link" href="https://github.com/sebastianromerocruz/game-programming-in-assembly?tab=readme-ov-file#october-13th-2022" target="_blank">computer</a>
+      <a class="bio-link" href="https://github.com/sebastianromerocruz/sonic-pi-lecture?tab=readme-ov-file#music-with-programming" target="_blank">science</a>.
+    </p>
 
-                            </div> -->
-                        </div>
-                    </div>
-                    <div id="experience-skan" class="skandinaviska d-none">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title exp-card-title">Skandinaviska Enskilda Banken (S.E.B.)</h5>
-                                <p class="card-text">Data Science Intern</p>
-                                <p class="exp-dates">New York, N.Y. (June 2019 – September 2019)</p>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item"><i class="fab fa-python fa-2x skill-logo exp-logo"></i> <i class="fab fa-google fa-2x skill-logo exp-logo"></i></li>
-                                <li class="list-group-item">Using the <strong>Google Places</strong> and <strong>OpenStreetMap</strong> APIs, developed a geocoding program capable of extracting the geometry of the physical assets of 100,000+ global
-                                    companies across 11 sectors and 70 industries.</li>
-                                <li class="list-group-item">Implemented appropriate pre-processing, filtering, and identity matching algorithms including a custom stop-word remover and a fuzzy-string token matching system towards refining the
-                                    results.</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div id="experience-pitchfork" class="pitchfork d-none">
-                        <div class="card">
-                            <div class="card-body">
-                                <h5 class="card-title exp-card-title">Pitchfork Review Sentiment Analysis</h5>
-                                <p class="card-text">Project</p>
-                                <p class="exp-dates">February 2019 – May 2019</p>
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item"><i class="fab fa-python fa-2x skill-logo exp-logo"></i> <i class="fab fa-docker fa-2x skill-logo exp-logo"></i> <i class="fab fa-js-square fa-2x skill-logo exp-logo"></i></li>
-                                <li class="list-group-item">Lead a team of 5 towards creating an automatic, fully scalable quantitative music scoring service using natural language processing (NLP) of 18,393 music reviews using <strong>Apache
-                                        Spark</strong>.</li>
-                                <li class="list-group-item">Developed a logistic regression machine-learning model that maximized the multi-class classification F-measure of the model to 0.383, improving on the original linear regression model.</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <!-- </div> -->
+    <p class="bio">
+      Outside of work, some of my interests involve
+      <span class="hl" data-panel="lang-ja">learning</span>
+      <span class="hl" data-panel="lang-cs">foreign</span>
+      <span class="hl" data-panel="lang-la">languages</span>,
+      <span class="hl" data-panel="music">music</span>,
+      and <span class="hl" data-panel="kyudo">ky&#363;d&#333;</span>.
+    </p>
 
-                    <!-- Japanese -->
-                    <div class="japanese d-none">
-                        <h1>Hi, I'm Sebastián. (🇯🇵)</h1>
-                        <p class="japanese-text">
-                            NYCで、<span class="hover-photo-text japanese-text">大学教授</span>兼<span class="hover-photo-text japanese-text">開発者</span>として働いています。
-                        </p>
-                        <p class="japanese-text">
-                            私は<span class="hover-photo-text japanese-text">メキシコ</span>出身で、<span class="hover-photo-text japanese-text">ニューヨーク大学</span>において勉強しました。
-                        </p>
-                        <p class="japanese-text">
-                            <span class="hover-photo-text">初級プログラミング</span>と、ゲームプログラミングの教育の仕事を大体していますが、<span class="hover-photo-text">他</span>の<span class="hover-photo-text">領域</span>に経験もあります。
-                        </p>
-                        <p class="japanese-text">
-                            私の趣味は、<span class="hover-photo-text japanese-text" style="color: #ffc2c2; border-bottom: solid 0px;">外国語</span>の学習、<span class="hover-photo-text japanese-text">音楽</span>、そして<span
-                                class="hover-photo-text japanese-text">弓道</span>です。
-                        </p>
-                        <p class="japanese-text">
-                            私の<span class="hover-photo-text japanese-text">Github</span>にご興味のある方はぜひご覧になって下さい。
-                        </p>
-                        <p class="japanese-text">
-                            <span class="hover-photo-text japanese-text">LinkedIn</span>も、<span class="hover-photo-text japanese-text">メール</span>もやっています。
-                        </p>
-                    </div>
+    <p class="bio">
+      Students can schedule office hours with me 
+      <a class="bio-link" href="https://calendly.com/profromerocruz/office-hours" target="_blank">here.</a> 
+      You can find me on <span class="hl" data-panel="contact">GitHub</span>
+      if you would like to check out my work,
+      on <span class="hl" data-panel="contact">LinkedIn</span>,
+      or via <span class="hl" data-panel="contact">e-mail</span>.
+    </p>
 
-                    <!-- Czech
-                    <div class="czech d-none">
-                        <h1>Ahoj,  Jsem Sebastián. (🇨🇿)</h1>
-                        <p>
-                            Jsem <span class="hover-photo-text">professor</span> a <span class="hover-photo-text">vývojář</span> v New Yorku。
-                        </p>
-                        <p class="japanese-text">
-                            私は<span class="hover-photo-text japanese-text">メキシコ</span>出身で、<span class="hover-photo-text japanese-text">ニューヨーク大学</span>において勉強しました。
-                        </p>
-                        <p class="japanese-text">
-                            <span class="hover-photo-text">初級プログラミング</span>と、ゲームプログラミングの教育の仕事を大体していますが、<span class="hover-photo-text">他</span>の<span class="hover-photo-text">領域</span>に経験もあります。
-                        </p>
-                        <p class="japanese-text">
-                            私の趣味は、<span class="hover-photo-text japanese-text" style="color: #ffc2c2; border-bottom: solid 0px;">外国語</span>の学習、<span class="hover-photo-text japanese-text">音楽</span>、そして<span
-                                class="hover-photo-text japanese-text">弓道</span>です。
-                        </p>
-                        <p class="japanese-text">
-                            私の<span class="hover-photo-text japanese-text">Github</span>にご興味のある方はぜひご覧になって下さい。
-                        </p>
-                        <p class="japanese-text">
-                            <span class="hover-photo-text japanese-text">LinkedIn</span>も、<span class="hover-photo-text japanese-text">メール</span>もやっています。
-                        </p>
-                    </div> -->
+    <!--
+      French Republican Calendar date.
+      Populated at runtime by main.js.
+        #rep-date-main — e.g. "5 Ventose An CCXXXIII"
+        #rep-date-day  — the day's plant/animal/tool name, coloured red
+    -->
+    <div id="republican-date">
+      <span id="rep-date-main"></span>
+      <span id="rep-date-day"></span>
+    </div>
 
-                    <!-- Maps -->
-                    <div class="map text-center d-none">
-                        <svg id="d3-map" width="420" height="550"></svg>
-                    </div>
+    <!-- Footer: persistent quick-links at the bottom of the left column -->
+    <div class="left-footer">
+      <a href="https://github.com/sebastianromerocruz">GitHub</a>
+      <a href="https://linkedin.com/in/sebastian-romerocruz">LinkedIn</a>
+      <a href="mailto:s.romerocruz@proton.me">Email</a>
+    </div>
 
-                    <!-- Music Spider Chart -->
-                    <div class="music text-center d-none">
-                        <h1>What can I play?</h1>
-                        <h4>And how well?*</h4>
-                        <svg id="d3-spider" width="600" height="600"></svg>
-                    </div>
-                </div>
 
-            </div>
+  </div><!-- /.left -->
+
+
+  <!-- ====================================================================
+       RIGHT COLUMN — Panels
+       All panels share the same grid cell (position:absolute, inset:0).
+       Only the panel with class .active is visible.
+       main.js handles activation; CSS handles the fade/slide transition.
+       ==================================================================== -->
+  <div class="right">
+
+
+    <!-- ==================================================================
+         DEFAULT PANEL — Portrait photo
+         Shown on page load and whenever no .hl word is hovered.
+
+         To replace the placeholder with a real photo:
+           1. Remove the .default-photo-fill div.
+           2. Add inside .default-photo-main:
+                <img src="assets/portrait.jpg" alt="Sebastian"
+                     class="default-photo-img" />
+         ================================================================== -->
+    <div class="panel panel-default active" id="panel-default">
+
+      <!--
+        Ghosted Bauhaus geometric mark — concentric circles, cross, diagonals,
+        red square centre. Renders at 4% opacity as a background texture.
+      -->
+      <div class="default-geo-bg">
+        <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"
+             aria-hidden="true">
+          <circle cx="60" cy="60" r="58" stroke="#0c0c0c" stroke-width="0.5"/>
+          <circle cx="60" cy="60" r="35" stroke="#0c0c0c" stroke-width="0.5"/>
+          <circle cx="60" cy="60" r="12" stroke="#0c0c0c" stroke-width="0.5"/>
+          <line x1="60"  y1="2"   x2="60"  y2="118" stroke="#0c0c0c" stroke-width="0.5"/>
+          <line x1="2"   y1="60"  x2="118" y2="60"  stroke="#0c0c0c" stroke-width="0.5"/>
+          <line x1="18"  y1="18"  x2="102" y2="102" stroke="#0c0c0c" stroke-width="0.5"/>
+          <line x1="102" y1="18"  x2="18"  y2="102" stroke="#0c0c0c" stroke-width="0.5"/>
+          <rect x="55" y="55" width="10" height="10" stroke="#cc3320" stroke-width="0.8"/>
+        </svg>
+      </div>
+
+      <!-- Photo frame with offset shadow border -->
+      <div class="default-photo-frame">
+        <div class="default-photo-shadow"></div>
+        <div class="default-photo-main">
+          <!--
+            Real photo — uncomment when asset is in place:
+            <img src="assets/portrait.jpg" alt="Sebastian" class="default-photo-img" />
+          -->
+          <!-- <div class="default-photo-fill">
+            <span>assets/portrait.jpg</span>
+          </div> -->
+        <img src="assets/portrait.jpg" alt="Sebastián" class="default-photo-img" />
+
         </div>
+        <div class="default-caption">Sebasti&#225;n · Romero Cruz</div>
+      </div>
+
+
+      <!--
+        Personal motto: 諸行無常 (shōgyō mujō) — all things are impermanent.
+        Displayed as UTF-8 hex bytes matching the email signature format.
+        Hovering reveals the kanji beneath.
+      -->
+      <div class="motto" id="motto" title="&#35504;&#34892;&#28961;&#24120;">
+        <pre class="motto-hex" aria-label="E8 AB B8 E8 A1 8C E7 84 A1 E5 B8 B8 — shōgyō mujō">;;;;;;;;;;;;;;;;;;;;;;;
+;; E8 AB B8 E8 A1 8C ;;
+;; E7 84 A1 E5 B8 B8 ;;
+;;;;;;;;;;;;;;;;;;;;;;;</pre>
+        <span class="motto-kanji" aria-hidden="true">&#35504;&#34892;&#28961;&#24120;</span>
+      </div>
+
+    </div><!-- /#panel-default -->
+
+
+    <!-- ==================================================================
+         PROFESSOR PANEL — Courses taught
+         Triggered by hovering "professor" in the bio.
+         ================================================================== -->
+    <div class="panel" id="panel-professor">
+      <div class="panel-bar"></div>
+      <div class="panel-index">02 / Teaching</div>
+      <h2 class="panel-title">Courses</h2>
+
+      <div class="courses-list">
+        <div class="course-item">
+          <div class="course-code">CS-UY 1113/4</div>
+          <div class="course-name">Programming &amp; Problem-Solving I</div>
         </div>
-    </section>
+        <div class="course-item">
+          <div class="course-code">CS-UY 1121</div>
+          <div class="course-name">Programming &amp; Problem-Solving II</div>
+        </div>
+        <div class="course-item">
+          <div class="course-code">CS-UY 1134</div>
+          <div class="course-name">Data Structures &amp; Algorithms</div>
+        </div>
+        <div class="course-item">
+          <div class="course-code">CS-UY 2214</div>
+          <div class="course-name">Computer Architecture &amp; Organization</div>
+        </div>
+        <div class="course-item">
+          <div class="course-code">CS-UY 3113</div>
+          <div class="course-name">Introduction to Game Programming</div>
+        </div>
+      </div>
+      <!-- Institutional affiliations — abbreviated, separated by middot -->
+      <div class="prof-affil">
+        <span class="prof-affil-item">NYU Tandon</span>
+        <span class="prof-affil-dot">&middot;</span>
+        <span class="prof-affil-item">NYU Courant</span>
+      </div>
+    </div><!-- /#panel-professor -->
 
-    <!-- Javascript files -->
-    <script src="https://d3js.org/d3.v4.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
-    <script src="https://d3js.org/d3-color.v1.min.js"></script>
-    <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
-    <script src="https://d3js.org/d3-ease.v1.min.js"></script>
-    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
-    <script src="https://d3js.org/d3-selection.v1.min.js"></script>
-    <script src="https://d3js.org/d3-timer.v1.min.js"></script>
-    <script src="https://d3js.org/d3-transition.v1.min.js"></script>
 
-    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
-    <script src="index.js"></script>
-    <script src="map.js"></script>
-    <script src="music-spider-chart.js"></script>
+    <!-- ==================================================================
+         DEVELOPER PANEL — Programming language proficiency
+         Triggered by hovering "developer" in the bio.
+
+         Chip system (see style.css section 7b):
+           .chip-solid   = fluent     (solid black fill, white text)
+           .chip-outline = proficient (outline only, black text)
+           .chip-ghost   = exploring  (faint grey border and text)
+         ================================================================== -->
+    <div class="panel" id="panel-developer">
+      <div class="panel-bar"></div>
+      <div class="panel-index">03 / Practice</div>
+      <h2 class="panel-title">Languages</h2>
+
+      <div class="chip-group">
+        <div class="chip-row">
+          <span class="chip-row-label">Main</span>
+          <div class="chip-items">
+            <span class="chip chip-solid">Python</span>
+            <span class="chip chip-solid">Java</span>
+          </div>
+        </div>
+        <div class="chip-row">
+          <span class="chip-row-label">Secondary</span>
+          <div class="chip-items">
+            <span class="chip chip-outline">C++</span>
+            <span class="chip chip-outline">C</span>
+            <span class="chip chip-outline">C#</span>
+          </div>
+        </div>
+        <div class="chip-row">
+          <span class="chip-row-label">Exploring</span>
+          <div class="chip-items">
+            <span class="chip chip-ghost">Haskell</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#panel-developer -->
+
+
+    <!-- ==================================================================
+         MEXICO CITY PANEL — Childhood photo
+         Triggered by hovering "Mexico City" in the bio.
+
+         To replace the placeholder with a real photo:
+           1. Remove the .photo-fill div.
+           2. Add inside .photo-border-main:
+                <img src="assets/cdmx.jpg"
+                     alt="Sebastian as a child in Mexico City"
+                     class="photo-img" />
+         ================================================================== -->
+    <div class="panel photo-panel" id="panel-mexico">
+      <div class="panel-bar"></div>
+
+      <div class="photo-frame">
+        <div class="photo-border-shadow"></div>
+        <div class="photo-border-main">
+            <img src="assets/cdmx.jpg"
+                 alt="Sebastian as a child in Mexico City"
+                 class="photo-img" />
+         
+          <!-- <div class="photo-fill">
+            <span>assets/cdmx.jpg</span>
+          </div> -->
+        </div>
+        <div class="photo-caption">Xalapa, Veracruz  · c. Mid-90s</div>
+      </div>
+    </div><!-- /#panel-mexico -->
+
+
+    <!-- ==================================================================
+         FLIGHT PANEL — Animated arc from Mexico City to New York
+         Triggered by hovering "moved" in the bio.
+
+         D3 draws into #flight-svg on first activation (runs only once).
+         The .flight-overlay label sits on top of the SVG.
+         ================================================================== -->
+    <div class="panel flight-panel" id="panel-moved">
+      <div class="panel-bar"></div>
+
+      <!-- Text overlay — sits above the SVG via document stacking order -->
+      <div class="flight-overlay">
+        <div class="panel-index">05 / Relocation</div>
+        <h2 class="panel-title" style="font-size: clamp(1.5rem, 3vw, 2.6rem);">
+          MEX<br>&#8594; <em>JFK</em>
+        </h2>
+      </div>
+
+      <!-- D3 renders its grid, path, markers, and plane into this element -->
+      <svg id="flight-svg" aria-label="Flight path from Mexico City to New York"></svg>
+
+    </div><!-- /#panel-moved -->
+
+
+    <!-- ==================================================================
+         NYU PANEL — Degrees
+         Triggered by hovering "NYU" in the bio.
+         ================================================================== -->
+    <div class="panel" id="panel-nyu">
+      <div class="panel-bar"></div>
+      <div class="panel-index">06 / Education</div>
+      <h2 class="panel-title">Degrees</h2>
+
+      <div class="degrees">
+        <div class="degree-card">
+          <div class="degree-gpa">GPA 3.4</div>
+          <div class="degree-year">BSc · 2017</div>
+          <div class="degree-name">Chemical &amp; Biomolecular Engineering</div>
+          <div class="degree-sub">Tandon School of Engineering</div>
+        </div>
+        <div class="degree-card">
+          <div class="degree-gpa">GPA 3.8</div>
+          <div class="degree-year">MSc · 2020</div>
+          <div class="degree-name">Computer Science</div>
+          <div class="degree-sub">Tandon School of Engineering</div>
+        </div>
+      </div>
+    </div><!-- /#panel-nyu -->
+
+
+    <!-- ==================================================================
+         MUSIC PANEL — Instrument proficiency
+         Triggered by hovering "music" in the bio.
+         Same chip system as the developer panel.
+         ================================================================== -->
+    <div class="panel" id="panel-music">
+      <div class="panel-bar"></div>
+      <div class="panel-index">07 / Music</div>
+      <h2 class="panel-title">Instruments</h2>
+
+      <div class="chip-group">
+        <div class="chip-row">
+          <span class="chip-row-label">Main</span>
+          <div class="chip-items">
+            <span class="chip chip-solid">Bass</span>
+          </div>
+        </div>
+        <div class="chip-row">
+          <span class="chip-row-label">Secondary</span>
+          <div class="chip-items">
+            <span class="chip chip-outline">Guitar</span>
+            <span class="chip chip-outline">Piano</span>
+          </div>
+        </div>
+        <div class="chip-row">
+          <span class="chip-row-label">Exploring</span>
+          <div class="chip-items">
+            <span class="chip chip-ghost">Music programming</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- /#panel-music -->
+
+
+    <!-- ==================================================================
+         KYUDO PANEL — Japanese traditional archery
+         Triggered by hovering "kyudo" in the bio.
+
+         Background: ghosted concentric archery-target SVG rings (8% opacity).
+         Foreground: large bow kanji, label, media frame, short description.
+
+         To replace the placeholder with a real asset:
+           Option A (gif):
+             Remove .kyudo-placeholder div, add inside it:
+               <img src="assets/kyudo.gif" alt="Kyudo practice"
+                    class="kyudo-media" />
+           Option B (video):
+             Remove .kyudo-placeholder div, add inside it:
+               <video src="assets/kyudo.mp4" autoplay loop muted
+                      class="kyudo-media"></video>
+         ================================================================== -->
+    <div class="panel kyudo-panel" id="panel-kyudo">
+      <div class="panel-bar"></div>
+
+      <!-- Concentric archery-target rings — decorative background -->
+      <div class="kyudo-rings" aria-hidden="true">
+        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="98" stroke="#0c0c0c" stroke-width="0.5"/>
+          <circle cx="100" cy="100" r="78" stroke="#0c0c0c" stroke-width="0.5"/>
+          <circle cx="100" cy="100" r="58" stroke="#0c0c0c" stroke-width="0.5"/>
+          <circle cx="100" cy="100" r="38" stroke="#0c0c0c" stroke-width="0.5"/>
+          <circle cx="100" cy="100" r="18" stroke="#cc3320" stroke-width="0.8"/>
+          <circle cx="100" cy="100" r="5"  fill="#cc3320"  opacity="0.6"/>
+          <line x1="100" y1="2"   x2="100" y2="198" stroke="#0c0c0c" stroke-width="0.3"/>
+          <line x1="2"   y1="100" x2="198" y2="100" stroke="#0c0c0c" stroke-width="0.3"/>
+        </svg>
+      </div>
+
+      <!-- Foreground: stacked content -->
+      <div class="kyudo-content">
+        <!-- Bow glyph: kanji for "bow" (the weapon) -->
+        <div class="kyudo-glyph" aria-label="Bow">&#24339;</div>
+        <div class="kyudo-label">08 / Ky&#363;d&#333;</div>
+
+        <!--
+          Media frame.
+          Replace this entire div with an <img> or <video> when the asset exists.
+        -->
+        <div class="kyudo-placeholder">
+            <img src="assets/kyudo.gif" alt="Kyudo practice" class="kyudo-media" />
+         
+          <!-- <span>assets/kyudo.gif</span> -->
+        </div>
+
+        <p class="kyudo-desc">
+          Japanese traditional archery.
+        </p>
+      </div>
+
+    </div><!-- /#panel-kyudo -->
+
+
+    <!-- ==================================================================
+         CONTACT PANEL
+         Triggered by hovering "GitHub", "LinkedIn", or "e-mail" in the bio.
+         ================================================================== -->
+    <div class="panel" id="panel-contact">
+      <div class="panel-bar"></div>
+      <div class="panel-index">09 / Contact</div>
+      <h2 class="panel-title">Connect</h2>
+
+      <div class="contact-links">
+        <a href="https://github.com/yourusername" class="contact-link" target="_blank">
+          GitHub
+          <span class="contact-handle">@sebastianromerocruz &#8594;</span>
+        </a>
+        <a href="https://linkedin.com/in/yourprofile" class="contact-link" target="_blank">
+          LinkedIn
+          <span class="contact-handle">/in/sebastian-romerocruz &#8594;</span>
+        </a>
+        <a href="mailto:you@example.com" class="contact-link">
+          Email
+          <span class="contact-handle">s.romerocruz@proton.me &#8594;</span>
+        </a>
+      </div>
+    </div><!-- /#panel-contact -->
+
+
+    <!-- ==================================================================
+         LANGUAGE PANELS — Bio in three additional languages
+         Triggered by hovering "learning" (JA), "foreign" (CS), "languages" (LA).
+
+         Structure of each panel:
+           - Large ghosted initial letter (top-right, aria-hidden)
+           - Section index label with extending hairline
+           - Translated bio paragraph with one key phrase in .lang-word (red)
+           - Footer links repeated in the target language
+         ================================================================== -->
+
+    <!-- Japanese -->
+    <div class="panel lang-panel" id="panel-lang-ja">
+      <div class="panel-bar"></div>
+      <div class="lang-badge" aria-hidden="true">日</div>
+      <div class="lang-index">Japanese / 日本語</div>
+      <p class="lang-bio">
+        NYCで、大学教授兼プログラマーとして働いています。私はメキシコ出身で、ニューヨーク大学において勉強しました。
+        <br>
+        <br>
+        初級プログラミングと、ゲームプログラミングの教育の仕事を大体していますが、他の領域に経験もあります。
+        <br>
+        <br>
+        私の趣味は、<span class="lang-word">外国語</span>の学習、音楽、そして弓道です。
+        <!-- &#31169;&#12399;&#12491;&#12517;&#12540;&#12520;&#12540;&#12463;&#24066;&#22312;&#20住;&#12398;&#12467;&#12531;&#12500;&#12517;&#12540;&#12479;&#12469;&#12452;&#12456;&#12531;&#12473;&#12398;&#25945;&#25480;&#12392;&#38283;&#30330;&#32773;&#12391;&#12377;&#12290;
+        &#12513;&#12461;&#12471;&#12467;&#12471;&#12486;&#12451;&#12391;&#29983;&#12414;&#12428;&#12289;&#24460;&#12395;&#12491;&#12517;&#12540;&#12520;&#12540;&#12463;&#12395;&#31227;&#12426;&#12289;NYU&#12391;&#23398;&#12403;&#12414;&#12375;&#12383;&#12290;
+        &#20027;&#12395;&#20837;&#38283;&#12503;&#12525;&#12464;&#12521;&#12511;&#12531;&#12464;&#12392;&#12499;&#12487;&#12458;&#12466;&#12540;&#12512;&#12503;&#12525;&#12464;&#12521;&#12511;&#12531;&#12464;&#12398;&#25945;&#32946;&#12395;&#25658;&#12431;&#12387;&#12390;&#12356;&#12414;&#12377;&#12364;&#12289;
+        &#12467;&#12531;&#12500;&#12517;&#12540;&#12479;&#12469;&#12452;&#12456;&#12531;&#12473;&#12398;&#20182;&#12398;&#20998;&#37326;&#12395;&#12418;&#32076;&#39443;&#12364;&#12354;&#12426;&#12414;&#12377;&#12290;
+        &#20仕&#20107;&#20197;&#22806;&#12391;&#12399;&#12289;<span class="lang-word">&#22806;&#22269;&#35486;&#12398;&#23398;&#32722;</span>&#12289;&#38899;&#27005;&#12289;&#12381;&#12375;&#12390;&#24335;&#36947;&#12395;&#20851;&#24515;&#12364;&#12354;&#12426;&#12414;&#12377;&#12290; -->
+      </p>
+      <div class="lang-footer">
+        <a href="https://github.com/sebastianromerocruz">GitHub</a>
+        <a href="https://linkedin.com/in/sebastian-romerocruz">LinkedIn</a>
+        <a href="mailto:s.romerocruz@proton.me">&#12513;&#12540;&#12523;</a>
+      </div>
+    </div><!-- /#panel-lang-ja -->
+
+    <!-- Czech -->
+    <div class="panel lang-panel" id="panel-lang-cs">
+      <div class="panel-bar"></div>
+      <div class="lang-badge" aria-hidden="true">&#268;</div>
+      <div class="lang-index">Czech / &#268;e&#353;tina</div>
+      <p class="lang-bio">
+        Jsem profesor informatiky a programátor v New Yorku.
+        Narodil jsem se v Mexico City a pozd&#283;ji jsem se p&#345;est&#283;hoval do New Yorku,
+        kde jsem studoval na NYU.
+        <br>
+        <br>
+        P&#345;ev&#225;&#382;n&#283; se v&#283;nuji v&#253;uce &#250;vodn&#237;ho programov&#225;n&#237; a programov&#225;n&#237; videoher,
+        ale m&#225;m zku&#353;enosti i v dal&#353;&#237;ch oblastech informatiky.
+        <br>
+        <br>
+        Mimo pr&#225;ci m&#283; zaj&#237;m&#225; v&#253;uka <span class="lang-word">ciz&#237;ch jazyk&#367;</span>,
+        hudba a kj&#250;d&#243;.
+      </p>
+      <div class="lang-footer">
+        <a href="https://github.com/sebastianromerocruz">GitHub</a>
+        <a href="https://linkedin.com/in/sebastian-romerocruz">LinkedIn</a>
+        <a href="mailto:s.romerocruz@proton.me">E-mail</a>
+      </div>
+    </div><!-- /#panel-lang-cs -->
+
+    <!-- Classical Latin -->
+    <div class="panel lang-panel" id="panel-lang-la">
+      <div class="panel-bar"></div>
+      <div class="lang-badge" aria-hidden="true">I</div>
+      <div class="lang-index">Classical Latin / Lingua Latina</div>
+      <p class="lang-bio">
+        Pr&#333;fessor scientiae computātōriōrum et programmātor sum, Nov&#299; Ebor&#257;c&#299; habit&#257;ns.
+        N&#257;tus Mexicā, mē poste&#257; locāvī ad Novum Eborācum,
+        ub&#299; in &#362;niversit&#257;te Novī Eborācī studu&#299;.
+        <br><br>
+        Plērumque in paedagōgīā programm&#257;ti&#333;nis et in programm&#257;ti&#333;ne l&#363;d&#333;rum vers&#257;tus sum,
+        sed etiam in ali&#299;s camp&#299;s scientiae computātōriōrum doctus sum.
+        <br><br>
+        Extr&#257; lab&#333;rem, <span class="lang-word">lingu&#299;s peregr&#299;n&#299;s</span>
+        discend&#299;s, m&#363;sicā, et Ky&#363;d&#333; fruor.
+      </p>
+      <div class="lang-footer">
+        <a href="https://github.com/sebastianromerocruz">GitHub</a>
+        <a href="https://linkedin.com/in/sebastian-romerocruz">LinkedIn</a>
+        <a href="mailto:s.romerocruz@proton.me">Epistula</a>
+      </div>
+    </div><!-- /#panel-lang-la -->
+
+
+  </div><!-- /.right -->
+
+</div><!-- /.site -->
+
+<!--
+  Main script — loaded at end of body so the DOM is fully parsed.
+  data-cfasync="false" prevents Cloudflare's email-obfuscation middleware
+  from injecting a failing CDN script immediately before ours.
+-->
+<script data-cfasync="false" src="main.js"></script>
 </body>
-
 </html>
