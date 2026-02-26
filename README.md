@@ -6,18 +6,18 @@ This guide explains how to build this site from scratch, in the order you would 
 
 ## Table of Contents
 
-1. [Project philosophy and file structure](#1-project-philosophy-and-file-structure)
-2. [HTML skeleton and layout](#2-html-skeleton-and-layout)
-3. [CSS design system](#3-css-design-system)
-4. [The panel switching system](#4-the-panel-switching-system)
-5. [Each panel, one by one](#5-each-panel-one-by-one)
-6. [The French Republican Calendar](#6-the-french-republican-calendar)
-7. [The D3 flight animation](#7-the-d3-flight-animation)
-8. [The glitch and net-art layer](#8-the-glitch-and-net-art-layer)
-9. [The motto — 諸行無常](#9-the-motto--諸行無常)
-10. [Entrance animations](#10-entrance-animations)
-11. [Deployment to GitHub Pages](#11-deployment-to-github-pages)
-12. [Swapping in real assets](#12-swapping-in-real-assets)
+1. [**Project philosophy and file structure**](#1-project-philosophy-and-file-structure)
+2. [**HTML skeleton and layout**](#2-html-skeleton-and-layout)
+3. [**CSS design system**](#3-css-design-system)
+4. [**The panel switching system**](#4-the-panel-switching-system)
+5. [**Each panel, one by one**](#5-each-panel-one-by-one)
+6. [**The French Republican Calendar**](#6-the-french-republican-calendar)
+7. [**The D3 flight animation**](#7-the-d3-flight-animation)
+8. [**The glitch and net-art layer**](#8-the-glitch-and-net-art-layer)
+9. [**The motto — 諸行無常**](#9-the-motto--諸行無常)
+10. [**Entrance animations**](#10-entrance-animations)
+11. [**Deployment to GitHub Pages**](#11-deployment-to-github-pages)
+12. [**Swapping in real assets**](#12-swapping-in-real-assets)
 
 ---
 
