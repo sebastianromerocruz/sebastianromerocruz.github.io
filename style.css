@@ -1,978 +1,978 @@
 /**
- * style.css
- * Personal site for Sebastián — Dieter Rams / Bauhaus aesthetic
- *
- * Design principles:
- *   - Off-white ground, near-black type, single signal red accent
- *   - IBM Plex Sans (body) + IBM Plex Mono (labels, indices, captions)
- *   - 1px hairline rules as the only decorative element
- *   - Visual weight communicates hierarchy — no numbers, no gradients
- *
- * Table of contents:
- *   1. Custom properties (design tokens)
- *   2. Reset & base
- *   3. Layout
- *   4. Left panel — biography
- *      4a. Section index strip
- *      4b. Name heading
- *      4c. Bio paragraphs & interactive words
- *      4d. Republican date
- *      4e. Footer links
- *   5. Right panel — shared panel scaffolding
- *   6. Default panel (portrait photo)
- *   7. Content panels
- *      7a. Courses (professor)
- *      7b. Chips — filled / outline / ghost (developer & music)
- *      7c. Photo frame (Mexico City)
- *      7d. Flight map
- *      7e. Degrees (NYU)
- *      7f. Kyūdō
- *      7g. Contact
- *      7h. Language panels (Japanese, Czech, Latin)
- *   8. Entrance animations
- */
+  * style.css
+  * Personal site for Sebastián — Dieter Rams / Bauhaus aesthetic
+  *
+  * Design principles:
+  *   - Off-white ground, near-black type, single signal red accent
+  *   - IBM Plex Sans (body) + IBM Plex Mono (labels, indices, captions)
+  *   - 1px hairline rules as the only decorative element
+  *   - Visual weight communicates hierarchy — no numbers, no gradients
+  *
+  * Table of contents:
+  *   1. Custom properties (design tokens)
+  *   2. Reset & base
+  *   3. Layout
+  *   4. Left panel — biography
+  *      4a. Section index strip
+  *      4b. Name heading
+  *      4c. Bio paragraphs & interactive words
+  *      4d. Republican date
+  *      4e. Footer links
+  *   5. Right panel — shared panel scaffolding
+  *   6. Default panel (portrait photo)
+  *   7. Content panels
+  *      7a. Courses (professor)
+  *      7b. Chips — filled / outline / ghost (developer & music)
+  *      7c. Photo frame (Mexico City)
+  *      7d. Flight map
+  *      7e. Degrees (NYU)
+  *      7f. Kyūdō
+  *      7g. Contact
+  *      7h. Language panels (Japanese, Czech, Latin)
+  *   8. Entrance animations
+  */
 
 
 /* ==========================================================================
-   1. Custom properties
-   ========================================================================== */
+      1. Custom properties
+      ========================================================================== */
 
 :root {
-  /* Colour palette — only four values plus transparent */
-  --black: #0c0c0c;   /* Near-black for type and borders          */
-  --white: #f4f3ef;   /* Warm off-white ground                     */
-  --mid:   #6e6e6e;   /* Mid-grey for secondary labels             */
-  --rule:  #d0cfc9;   /* Light warm-grey for horizontal rules      */
-  --red:   #cc3320;   /* Signal red — accent only, used sparingly  */
+    /* Colour palette — only four values plus transparent */
+    --black: #0c0c0c;   /* Near-black for type and borders          */
+    --white: #f4f3ef;   /* Warm off-white ground                     */
+    --mid:   #6e6e6e;   /* Mid-grey for secondary labels             */
+    --rule:  #d0cfc9;   /* Light warm-grey for horizontal rules      */
+    --red:   #cc3320;   /* Signal red — accent only, used sparingly  */
 
-  /* Type stacks */
-  --sans: 'IBM Plex Sans', Helvetica, sans-serif;
-  --mono: 'IBM Plex Mono', monospace;
+    /* Type stacks */
+    --sans: 'IBM Plex Sans', Helvetica, sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
 }
 
 
 /* ==========================================================================
-   2. Reset & base
-   ========================================================================== */
+      2. Reset & base
+      ========================================================================== */
 
 *, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 html, body {
-  height: 100%;
-  overflow: hidden; /* Single-screen layout — no scroll */
+    height: 100%;
+    overflow: hidden; /* Single-screen layout — no scroll */
 }
 
 body {
-  background: var(--white);
-  color: var(--black);
-  font-family: var(--sans);
-  font-weight: 300;
+    background: var(--white);
+    color: var(--black);
+    font-family: var(--sans);
+    font-weight: 300;
 }
 
 
 /* ==========================================================================
-   3. Layout
-   ========================================================================== */
+      3. Layout
+      ========================================================================== */
 
 /* Two equal columns filling the viewport */
 .site {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100vh;
 }
 
 
 /* ==========================================================================
-   4. Left panel — biography
-   ========================================================================== */
+      4. Left panel — biography
+      ========================================================================== */
 
 .left {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 3.5rem 4rem;
-  border-right: 1px solid var(--black);
-  position: relative;
-  background: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3.5rem 4rem;
+    border-right: 1px solid var(--black);
+    position: relative;
+    background: var(--white);
 }
 
 
 /* 4a. Section index strip
-   ─────────────────────────────────────────────────────────────────────────
-   Small mono label + extending hairline rule at the top of the left column.
-   Pattern reused across right-panel headers via .panel-index.             */
+      ─────────────────────────────────────────────────────────────────────────
+      Small mono label + extending hairline rule at the top of the left column.
+      Pattern reused across right-panel headers via .panel-index.             */
 
 .left-index {
-  position: absolute;
-  top: 2.5rem;
-  left: 4rem;
-  right: 4rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+    position: absolute;
+    top: 2.5rem;
+    left: 4rem;
+    right: 4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .left-index-label {
-  font-family: var(--mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--mid);
-  white-space: nowrap;
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--mid);
+    white-space: nowrap;
 }
 
 /* Hairline that fills remaining horizontal space */
 .left-index-rule {
-  flex: 1;
-  height: 1px;
-  background: var(--rule);
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
 }
 
 
 /* 4b. Name heading
-   ─────────────────────────────────────────────────────────────────────────
-   Large uppercase name. The trailing period is wrapped in <em> and coloured
-   red — the only decorative flourish on the left side.                    */
+      ─────────────────────────────────────────────────────────────────────────
+      Large uppercase name. The trailing period is wrapped in <em> and coloured
+      red — the only decorative flourish on the left side.                    */
 
 .name-heading {
-  font-family: var(--sans);
-  font-size: clamp(2.2rem, 4vw, 3.4rem);
-  font-weight: 500;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  text-transform: uppercase;
-  color: var(--black);
-  margin-bottom: 1.5rem;
+    font-family: var(--sans);
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--black);
+    margin-bottom: 1.5rem;
 }
 
 .name-heading em {
-  font-style: normal;
-  color: var(--red);
+    font-style: normal;
+    color: var(--red);
 }
 
 
 /* 4c. Bio paragraphs & interactive words
-   ─────────────────────────────────────────────────────────────────────────
-   .bio        — body text paragraphs
-   .hl         — panel-trigger words (dotted underline → solid red on hover)
-   .bio-link   — external hyperlinks (same visual treatment as .hl)        */
+      ─────────────────────────────────────────────────────────────────────────
+      .bio        — body text paragraphs
+      .hl         — panel-trigger words (dotted underline → solid red on hover)
+      .bio-link   — external hyperlinks (same visual treatment as .hl)        */
 
 .bio {
-  font-family: var(--sans);
-  font-size: clamp(0.9rem, 1.5vw, 1.25rem);
-  font-weight: 300;
-  line-height: 1.85;
-  color: var(--black);
-  letter-spacing: -0.005em;
+    font-family: var(--sans);
+    font-size: clamp(0.9rem, 1.5vw, 1.25rem);
+    font-weight: 300;
+    line-height: 1.85;
+    color: var(--black);
+    letter-spacing: -0.005em;
 }
 
 /* Breathing room between consecutive paragraphs */
 .bio + .bio {
-  margin-top: 0.9em;
+    margin-top: 0.9em;
 }
 
 /* Panel-trigger words — dotted underline at rest, solid red when active */
 .hl {
-  cursor: default;
-  display: inline;
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  text-decoration-color: rgba(204,51,32,0.55);
-  text-underline-offset: 4px;
-  text-decoration-thickness: 2px;
-  transition: color 0.12s, text-decoration-color 0.12s, text-decoration-style 0.12s;
+    cursor: default;
+    display: inline;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: rgba(204,51,32,0.55);
+    text-underline-offset: 4px;
+    text-decoration-thickness: 2px;
+    transition: color 0.12s, text-decoration-color 0.12s, text-decoration-style 0.12s;
 }
 
 .hl:hover,
 .hl.active {
-  color: var(--red);
-  text-decoration-color: var(--red);
-  text-decoration-style: solid;
+    color: var(--red);
+    text-decoration-color: var(--red);
+    text-decoration-style: solid;
 }
 
 /* External links — identical visual treatment to .hl but behave as real links */
 .bio-link {
-  color: var(--black);
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  text-decoration-color: rgba(204,51,32,0.55);
-  text-underline-offset: 4px;
-  text-decoration-thickness: 2px;
-  transition: color 0.12s, text-decoration-color 0.12s, text-decoration-style 0.12s;
+    color: var(--black);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: rgba(204,51,32,0.55);
+    text-underline-offset: 4px;
+    text-decoration-thickness: 2px;
+    transition: color 0.12s, text-decoration-color 0.12s, text-decoration-style 0.12s;
 }
 
 .bio-link:hover {
-  color: var(--red);
-  text-decoration-color: var(--red);
-  text-decoration-style: solid;
+    color: var(--red);
+    text-decoration-color: var(--red);
+    text-decoration-style: solid;
 }
 
 
 /* 4d. Republican date
-   ─────────────────────────────────────────────────────────────────────────
-   Today's date in the French Republican calendar, rendered in the bottom-left
-   of the biography column. Day name appears below in red.                 */
+      ─────────────────────────────────────────────────────────────────────────
+      Today's date in the French Republican calendar, rendered in the bottom-left
+      of the biography column. Day name appears below in red.                 */
 
 #republican-date {
-  position: absolute;
-  bottom: 4.75rem;
-  left: 4rem;
-  font-family: var(--mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: var(--mid);
-  display: flex;
-  flex-direction: column;
-  gap: 0.18rem;
+    position: absolute;
+    bottom: 4.75rem;
+    left: 4rem;
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--mid);
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
 }
 
 /* The plant/object name for the day, coloured red */
 #rep-date-day {
-  color: var(--red);
+    color: var(--red);
 }
 
 
 /* 4e. Footer links
-   ─────────────────────────────────────────────────────────────────────────
-   GitHub · LinkedIn · Email — bottom-left, mono caps                      */
+      ─────────────────────────────────────────────────────────────────────────
+      GitHub · LinkedIn · Email — bottom-left, mono caps                      */
 
 .left-footer {
-  position: absolute;
-  bottom: 2.5rem;
-  left: 4rem;
-  display: flex;
-  gap: 2rem;
+    position: absolute;
+    bottom: 2.5rem;
+    left: 4rem;
+    display: flex;
+    gap: 2rem;
 }
 
 .left-footer a {
-  font-family: var(--mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--mid);
-  text-decoration: none;
-  transition: color 0.12s;
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--mid);
+    text-decoration: none;
+    transition: color 0.12s;
 }
 
 .left-footer a:hover {
-  color: var(--red);
+    color: var(--red);
 }
 
 
 /* ==========================================================================
-   5. Right panel — shared panel scaffolding
-   ========================================================================== */
+      5. Right panel — shared panel scaffolding
+      ========================================================================== */
 
 /* Container — clips all absolutely-positioned panels */
 .right {
-  position: relative;
-  overflow: hidden;
-  background: var(--white);
+    position: relative;
+    overflow: hidden;
+    background: var(--white);
 }
 
 /* Every panel occupies the full right column, stacked via position:absolute.
-   Inactive panels are invisible and non-interactive.                       */
+      Inactive panels are invisible and non-interactive.                       */
 .panel {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 3.5rem 4rem;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.22s ease, transform 0.22s ease;
-  pointer-events: none;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3.5rem 4rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+    pointer-events: none;
 }
 
 .panel.active {
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
 }
 
 /* Red bar that slides in from the left along the top edge of any active panel */
 .panel-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--red);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .panel.active .panel-bar {
-  transform: scaleX(1);
+    transform: scaleX(1);
 }
 
 /* Numbered section label with extending hairline — used at top of each panel */
 .panel-index {
-  font-family: var(--mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 1.75rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .panel-index::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--rule);
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
 }
 
 /* Large uppercase panel title */
 .panel-title {
-  font-family: var(--sans);
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  font-weight: 500;
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-  text-transform: uppercase;
-  color: var(--black);
-  margin-bottom: 2rem;
+    font-family: var(--sans);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    color: var(--black);
+    margin-bottom: 2rem;
 }
 
 .panel-title em {
-  font-style: normal;
-  color: var(--red);
+    font-style: normal;
+    color: var(--red);
 }
 
 
 /* ==========================================================================
-   6. Default panel (portrait photo)
-   ========================================================================== */
+      6. Default panel (portrait photo)
+      ========================================================================== */
 
 /* Centred layout for the default/idle state */
 .panel-default {
-  align-items: center;
-  justify-content: center;
-  padding: 4rem;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
 }
 
 /* Ghosted Bauhaus geometric mark — sits behind the photo at 4% opacity */
 .default-geo-bg {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
 }
 
 .default-geo-bg svg {
-  width: 80%;
-  height: 80%;
-  opacity: 0.04;
+    width: 80%;
+    height: 80%;
+    opacity: 0.04;
 }
 
 /* Photo frame — 1px solid border with offset shadow border */
 .default-photo-frame {
-  position: relative;
-  width: 200px;
-  height: 250px;
+    position: relative;
+    width: 200px;
+    height: 250px;
 }
 
 .default-photo-main {
-  position: absolute;
-  inset: 0;
-  border: 1px solid var(--black);
-  overflow: hidden; /* Clips the <img> to the frame */
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--black);
+    overflow: hidden; /* Clips the <img> to the frame */
 }
 
 /* Offset decorative border — appears to sit behind and below the main frame */
 .default-photo-shadow {
-  position: absolute;
-  top: 7px;
-  left: 7px;
-  right: -7px;
-  bottom: -7px;
-  border: 1px solid var(--rule);
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    right: -7px;
+    bottom: -7px;
+    border: 1px solid var(--rule);
 }
 
 /* Hatched placeholder — shown until the real photo is placed in assets/ */
 .default-photo-fill {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    var(--white) 0,
-    var(--white) 3px,
-    var(--rule)  3px,
-    var(--rule)  4px
-  );
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        45deg,
+        var(--white) 0,
+        var(--white) 3px,
+        var(--rule)  3px,
+        var(--rule)  4px
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .default-photo-fill span {
-  font-family: var(--mono);
-  font-size: 0.52rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--mid);
+    font-family: var(--mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
 }
 
 /* Caption below the frame */
 .default-caption {
-  position: absolute;
-  bottom: -2rem;
-  left: 0;
-  font-family: var(--mono);
-  font-size: 0.52rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--mid);
+    position: absolute;
+    bottom: -2rem;
+    left: 0;
+    font-family: var(--mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
 }
 
 /* The actual portrait image — replace placeholder div with this when ready */
 .default-photo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-  display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
 }
 
 
 /* ==========================================================================
-   7. Content panels
-   ========================================================================== */
+      7. Content panels
+      ========================================================================== */
 
 
 /* 7a. Professor affiliation
-   ─────────────────────────────────────────────────────────────────────────
-   Abbreviated institution names shown below the course list.
-   Single row: "Tandon · Courant" — mono caps, sits quietly as a footer
-   to the panel content without drawing attention away from the courses.   */
+      ─────────────────────────────────────────────────────────────────────────
+      Abbreviated institution names shown below the course list.
+      Single row: "Tandon · Courant" — mono caps, sits quietly as a footer
+      to the panel content without drawing attention away from the courses.   */
 
 .prof-affil {
-  margin-top: 1.5rem;
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
+    margin-top: 1.5rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
 }
 
 .prof-affil-item {
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--mid);
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mid);
 }
 
 /* Middot separator — slightly lighter than the text */
 .prof-affil-dot {
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  color: var(--rule);
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    color: var(--rule);
 }
 
 
 /* 7a. Courses (professor panel)
-   ─────────────────────────────────────────────────────────────────────────
-   Two-column grid: course code on the left, name on the right.
-   Rows separated by 1px hairline rules.                                   */
+      ─────────────────────────────────────────────────────────────────────────
+      Two-column grid: course code on the left, name on the right.
+      Rows separated by 1px hairline rules.                                   */
 
 .courses-list {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .course-item {
-  display: grid;
-  grid-template-columns: 7rem 1fr;
-  border-top: 1px solid var(--rule);
-  padding: 0.85rem 0;
-  align-items: baseline;
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    border-top: 1px solid var(--rule);
+    padding: 0.85rem 0;
+    align-items: baseline;
 }
 
 .course-item:last-child {
-  border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
 }
 
 .course-code {
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.07em;
-  color: var(--red);
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.07em;
+    color: var(--red);
 }
 
 .course-name {
-  font-size: 0.9rem;
-  font-weight: 400;
+    font-size: 0.9rem;
+    font-weight: 400;
 }
 
 
 /* 7b. Chips — filled / outline / ghost
-   ─────────────────────────────────────────────────────────────────────────
-   Used for both developer toolkit and instrument proficiency.
-   Visual weight communicates fluency — no numbers, no progress bars.
-     .chip-solid   = mastered (solid black fill)
-     .chip-outline = proficient (outline only)
-     .chip-ghost   = exploring (faint grey border, grey text)              */
+      ─────────────────────────────────────────────────────────────────────────
+      Used for both developer toolkit and instrument proficiency.
+      Visual weight communicates fluency — no numbers, no progress bars.
+          .chip-solid   = mastered (solid black fill)
+          .chip-outline = proficient (outline only)
+          .chip-ghost   = exploring (faint grey border, grey text)              */
 
 .chip-group {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .chip-row {
-  border-top: 1px solid var(--rule);
-  padding: 0.85rem 0;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+    border-top: 1px solid var(--rule);
+    padding: 0.85rem 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .chip-row:last-child {
-  border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
 }
 
 /* Fixed-width tier label (Fluent / Proficient / Exploring etc.) */
 .chip-row-label {
-  font-family: var(--mono);
-  font-size: 0.52rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--mid);
-  flex-shrink: 0;
-  width: 5.5rem;
+    font-family: var(--mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mid);
+    flex-shrink: 0;
+    width: 5.5rem;
 }
 
 .chip-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
 }
 
 /* Base chip — mono text, rectangular, no border-radius (Bauhaus = no rounding) */
 .chip {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.06em;
-  padding: 0.3rem 0.65rem;
-  line-height: 1;
-  border: 1px solid transparent;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    padding: 0.3rem 0.65rem;
+    line-height: 1;
+    border: 1px solid transparent;
 }
 
 /* Fully mastered — solid black, white text */
 .chip-solid {
-  background: var(--black);
-  color: var(--white);
-  border-color: var(--black);
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
 }
 
 /* Working knowledge — outline only, black text */
 .chip-outline {
-  background: transparent;
-  color: var(--black);
-  border-color: var(--black);
+    background: transparent;
+    color: var(--black);
+    border-color: var(--black);
 }
 
 /* Early-stage / exploratory — ghost, grey text */
 .chip-ghost {
-  background: transparent;
-  color: var(--mid);
-  border-color: var(--rule);
+    background: transparent;
+    color: var(--mid);
+    border-color: var(--rule);
 }
 
 
 /* 7c. Photo frame (Mexico City panel)
-   ─────────────────────────────────────────────────────────────────────────
-   Slightly larger than the default portrait (childhood photo).             */
+      ─────────────────────────────────────────────────────────────────────────
+      Slightly larger than the default portrait (childhood photo).             */
 
 .photo-panel {
-  align-items: center;
-  justify-content: center;
+    align-items: center;
+    justify-content: center;
 }
 
 .photo-frame {
-  position: relative;
-  width: 210px;
-  height: 260px;
+    position: relative;
+    width: 210px;
+    height: 260px;
 }
 
 .photo-border-main {
-  position: absolute;
-  inset: 0;
-  border: 1px solid var(--black);
-  overflow: hidden;
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--black);
+    overflow: hidden;
 }
 
 .photo-border-shadow {
-  position: absolute;
-  top: 7px;
-  left: 7px;
-  right: -7px;
-  bottom: -7px;
-  border: 1px solid var(--rule);
+    position: absolute;
+    top: 7px;
+    left: 7px;
+    right: -7px;
+    bottom: -7px;
+    border: 1px solid var(--rule);
 }
 
 /* Hatched placeholder — replace with <img> pointing to assets/cdmx.jpg */
 .photo-fill {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    var(--white) 0,
-    var(--white) 3px,
-    var(--rule)  3px,
-    var(--rule)  4px
-  );
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        45deg,
+        var(--white) 0,
+        var(--white) 3px,
+        var(--rule)  3px,
+        var(--rule)  4px
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .photo-fill span {
-  font-family: var(--mono);
-  font-size: 0.52rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--mid);
+    font-family: var(--mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
 }
 
 .photo-caption {
-  position: absolute;
-  bottom: -1.8rem;
-  left: 0;
-  font-family: var(--mono);
-  font-size: 0.52rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--mid);
+    position: absolute;
+    bottom: -1.8rem;
+    left: 0;
+    font-family: var(--mono);
+    font-size: 0.52rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
 }
 
 /* Actual photo image class — use instead of .photo-fill when asset is ready */
 .photo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-  display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
 }
 
 
 /* 7d. Flight map (relocation panel)
-   ─────────────────────────────────────────────────────────────────────────
-   The SVG fills the entire panel; D3 draws into it.
-   Label overlay sits in the top-left corner above the map.                */
+      ─────────────────────────────────────────────────────────────────────────
+      The SVG fills the entire panel; D3 draws into it.
+      Label overlay sits in the top-left corner above the map.                */
 
 .flight-panel {
-  padding: 0; /* SVG takes full bleed */
+    padding: 0; /* SVG takes full bleed */
 }
 
 #flight-svg {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 .flight-overlay {
-  position: absolute;
-  top: 3.5rem;
-  left: 4rem;
-  pointer-events: none;
+    position: absolute;
+    top: 3.5rem;
+    left: 4rem;
+    pointer-events: none;
 }
 
 
 /* 7e. Degrees (NYU panel)
-   ─────────────────────────────────────────────────────────────────────────
-   Each degree is a card separated by hairline rules.
-   GPA is right-aligned within the card via position:absolute.             */
+      ─────────────────────────────────────────────────────────────────────────
+      Each degree is a card separated by hairline rules.
+      GPA is right-aligned within the card via position:absolute.             */
 
 .degrees {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .degree-card {
-  border-top: 1px solid var(--rule);
-  padding: 1.1rem 0;
-  position: relative;
+    border-top: 1px solid var(--rule);
+    padding: 1.1rem 0;
+    position: relative;
 }
 
 .degree-card:last-child {
-  border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
 }
 
 .degree-year {
-  font-family: var(--mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.13em;
-  color: var(--red);
-  margin-bottom: 0.3rem;
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.13em;
+    color: var(--red);
+    margin-bottom: 0.3rem;
 }
 
 .degree-name {
-  font-size: 0.95rem;
-  font-weight: 500;
-  margin-bottom: 0.2rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
 }
 
 .degree-sub {
-  font-family: var(--mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.08em;
-  color: var(--mid);
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.08em;
+    color: var(--mid);
 }
 
 /* GPA floated to the right of the card */
 .degree-gpa {
-  position: absolute;
-  right: 0;
-  top: 1.1rem;
-  font-family: var(--mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.1em;
-  color: var(--mid);
+    position: absolute;
+    right: 0;
+    top: 1.1rem;
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+    color: var(--mid);
 }
 
 
 /* 7f. Kyūdō panel
-   ─────────────────────────────────────────────────────────────────────────
-   Centred composition: concentric archery-target rings (SVG) behind a large
-   ghosted 弓 kanji, with a gif/video placeholder frame below.             */
+      ─────────────────────────────────────────────────────────────────────────
+      Centred composition: concentric archery-target rings (SVG) behind a large
+      ghosted 弓 kanji, with a gif/video placeholder frame below.             */
 
 .kyudo-panel {
-  align-items: center;
-  justify-content: center;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Concentric rings fill the whole panel background */
 .kyudo-rings {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
 }
 
 .kyudo-rings svg {
-  width: 70%;
-  height: 70%;
-  opacity: 0.08;
+    width: 70%;
+    height: 70%;
+    opacity: 0.08;
 }
 
 /* Stacked content: kanji → label → media frame → description */
 .kyudo-content {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
 }
 
 /* Large 弓 kanji glyph */
 .kyudo-glyph {
-  font-size: 5rem;
-  line-height: 1;
-  color: var(--black);
-  opacity: 0.6;
+    font-size: 5rem;
+    line-height: 1;
+    color: var(--black);
+    opacity: 0.6;
 }
 
 .kyudo-label {
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--mid);
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--mid);
 }
 
 /* Media placeholder frame — replace contents with <img> or <video> from assets/ */
 .kyudo-placeholder {
-  width: 180px;
-  height: 120px;
-  border: 1px solid var(--black);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  background: repeating-linear-gradient(
-    45deg,
-    var(--white) 0,
-    var(--white) 3px,
-    var(--rule)  3px,
-    var(--rule)  4px
-  );
-  overflow: hidden;
+    width: 180px;
+    height: 120px;
+    border: 1px solid var(--black);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    background: repeating-linear-gradient(
+        45deg,
+        var(--white) 0,
+        var(--white) 3px,
+        var(--rule)  3px,
+        var(--rule)  4px
+    );
+    overflow: hidden;
 }
 
 .kyudo-placeholder {
-  width: 120px;   /* narrower */
-  height: 180px;  /* taller — swap the original 180×120 */
-  /* rest of the properties stay the same */
+    width: 120px;   /* narrower */
+    height: 180px;  /* taller — swap the original 180×120 */
+    /* rest of the properties stay the same */
 }
 
 /* The actual gif/video — use instead of placeholder when asset is ready */
 .kyudo-media {
-  width: 100%;
-  height: auto;        /* let the image's natural aspect ratio determine height */
-  object-fit: contain; /* show the whole image, no cropping */
-  display: block;
+    width: 100%;
+    height: auto;        /* let the image's natural aspect ratio determine height */
+    object-fit: contain; /* show the whole image, no cropping */
+    display: block;
 }
 
 .kyudo-desc {
-  font-size: 0.82rem;
-  color: var(--mid);
-  max-width: 22ch;
-  line-height: 1.6;
+    font-size: 0.82rem;
+    color: var(--mid);
+    max-width: 22ch;
+    line-height: 1.6;
 }
 
 
 /* 7g. Contact panel
-   ─────────────────────────────────────────────────────────────────────────
-   Simple list of links; each row separated by a hairline rule.            */
+      ─────────────────────────────────────────────────────────────────────────
+      Simple list of links; each row separated by a hairline rule.            */
 
 .contact-links {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .contact-link {
-  border-top: 1px solid var(--rule);
-  padding: 0.95rem 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  text-decoration: none;
-  color: var(--black);
-  font-size: 0.95rem;
-  font-weight: 400;
-  transition: color 0.12s;
+    border-top: 1px solid var(--rule);
+    padding: 0.95rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    text-decoration: none;
+    color: var(--black);
+    font-size: 0.95rem;
+    font-weight: 400;
+    transition: color 0.12s;
 }
 
 .contact-link:last-child {
-  border-bottom: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
 }
 
 .contact-link:hover {
-  color: var(--red);
+    color: var(--red);
 }
 
 /* Handle / URL shown in small mono on the right */
 .contact-handle {
-  font-family: var(--mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.08em;
-  color: var(--mid);
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.08em;
+    color: var(--mid);
 }
 
 
 /* 7h. Language panels (Japanese, Czech, Latin)
-   ─────────────────────────────────────────────────────────────────────────
-   Each panel shows the bio translated into the target language.
-   A large ghosted script character sits in the top-right corner.          */
+      ─────────────────────────────────────────────────────────────────────────
+      Each panel shows the bio translated into the target language.
+      A large ghosted script character sits in the top-right corner.          */
 
 .lang-panel {
-  background: var(--white);
+    background: var(--white);
 }
 
 /* Large ghosted letter or character — decorative background element */
 .lang-badge {
-  position: absolute;
-  top: 2rem;
-  right: 3rem;
-  font-family: var(--sans);
-  font-size: 7rem;
-  font-weight: 500;
-  color: var(--black);
-  opacity: 0.04;
-  user-select: none;
-  line-height: 1;
-  letter-spacing: -0.05em;
+    position: absolute;
+    top: 2rem;
+    right: 3rem;
+    font-family: var(--sans);
+    font-size: 7rem;
+    font-weight: 500;
+    color: var(--black);
+    opacity: 0.04;
+    user-select: none;
+    line-height: 1;
+    letter-spacing: -0.05em;
 }
 
 /* Numbered section label — same pattern as .panel-index */
 .lang-index {
-  font-family: var(--mono);
-  font-size: 0.55rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 1.75rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .lang-index::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--rule);
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
 }
 
 /* Translated bio text */
 .lang-bio {
-  font-family: var(--sans);
-  font-size: clamp(0.9rem, 1.5vw, 1.25rem);
-  font-weight: 300;
-  line-height: 1.85;
-  color: var(--black);
-  letter-spacing: -0.005em;
+    font-family: var(--sans);
+    font-size: clamp(0.9rem, 1.5vw, 1.25rem);
+    font-weight: 300;
+    line-height: 1.85;
+    color: var(--black);
+    letter-spacing: -0.005em;
 }
 
 /* Key words highlighted in red within the translated bio */
 .lang-word {
-  color: var(--red);
-  font-weight: 400;
-  border-bottom: 1px solid var(--red);
+    color: var(--red);
+    font-weight: 400;
+    border-bottom: 1px solid var(--red);
 }
 
 /* Footer links repeated in the target language */
 .lang-footer {
-  position: absolute;
-  bottom: 2.5rem;
-  left: 4rem;
-  display: flex;
-  gap: 2rem;
+    position: absolute;
+    bottom: 2.5rem;
+    left: 4rem;
+    display: flex;
+    gap: 2rem;
 }
 
 .lang-footer a {
-  font-family: var(--mono);
-  font-size: 0.56rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--mid);
-  text-decoration: none;
+    font-family: var(--mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--mid);
+    text-decoration: none;
 }
 
 
 /* ==========================================================================
-   8. Entrance animations
-   ========================================================================== */
+      8. Entrance animations
+      ========================================================================== */
 
 /**
- * Elements fade in on page load with staggered delays.
- * Uses animation-fill-mode: both so elements start invisible
- * before the delay fires.
- */
+  * Elements fade in on page load with staggered delays.
+  * Uses animation-fill-mode: both so elements start invisible
+  * before the delay fires.
+  */
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 .name-heading    { animation: fadeIn 0.5s 0.00s ease both; }
@@ -982,220 +982,220 @@ body {
 #republican-date { animation: fadeIn 0.5s 0.15s ease both; }
 
 /* ==========================================================================
-   9. Glitch & net-art layer  (EXPERIMENTAL)
-   ==========================================================================
-   Bauhaus structure is the skeleton. These rules are the surface misbehaving.
+      9. Glitch & net-art layer  (EXPERIMENTAL)
+      ==========================================================================
+      Bauhaus structure is the skeleton. These rules are the surface misbehaving.
 
-   Effects:
-     9a. Custom crosshair cursor
-     9b. CRT scan-line overlay on the right panel
-     9c. RGB chromatic-aberration split on the name heading
-     9d. Glitch-stutter on the red panel-bar slide-in
-     9e. Panel transition — scan-line wipe replaces clean fade
-     9f. Glitch flicker keyframes (used by JS-driven text scramble)
-     9g. Red cursor trail dot
-   ========================================================================== */
+      Effects:
+          9a. Custom crosshair cursor
+          9b. CRT scan-line overlay on the right panel
+          9c. RGB chromatic-aberration split on the name heading
+          9d. Glitch-stutter on the red panel-bar slide-in
+          9e. Panel transition — scan-line wipe replaces clean fade
+          9f. Glitch flicker keyframes (used by JS-driven text scramble)
+          9g. Red cursor trail dot
+      ========================================================================== */
 
 
 /* 9a. Custom crosshair cursor
-   ─────────────────────────────────────────────────────────────────────────
-   Replace the default pointer with a tight crosshair across the whole site.
-   The JS cursor-trail effect adds a red dot that follows it.              */
+      ─────────────────────────────────────────────────────────────────────────
+      Replace the default pointer with a tight crosshair across the whole site.
+      The JS cursor-trail effect adds a red dot that follows it.              */
 
 .site { cursor: crosshair; }
 .hl   { cursor: crosshair; }
 
 
 /* 9b. CRT scan-line overlay
-   ─────────────────────────────────────────────────────────────────────────
-   A repeating linear-gradient of near-transparent dark stripes laid over
-   the right column, simulating a low-resolution CRT monitor.
-   pointer-events:none ensures it never blocks interaction.                */
+      ─────────────────────────────────────────────────────────────────────────
+      A repeating linear-gradient of near-transparent dark stripes laid over
+      the right column, simulating a low-resolution CRT monitor.
+      pointer-events:none ensures it never blocks interaction.                */
 
 .right::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent          0px,
-    transparent          2px,
-    rgba(0, 0, 0, 0.018) 2px,
-    rgba(0, 0, 0, 0.018) 4px
-  );
-  pointer-events: none;
-  z-index: 100;
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent          0px,
+        transparent          2px,
+        rgba(0, 0, 0, 0.018) 2px,
+        rgba(0, 0, 0, 0.018) 4px
+    );
+    pointer-events: none;
+    z-index: 100;
 }
 
 
 /* 9c. Name heading — RGB chromatic aberration on hover
-   ─────────────────────────────────────────────────────────────────────────
-   The heading gets a red/blue channel split via CSS text-shadow pseudo-
-   layers. At rest: clean. On hover: the ghost channels drift apart.
-   A subtle clip animation runs continuously once triggered.               */
+      ─────────────────────────────────────────────────────────────────────────
+      The heading gets a red/blue channel split via CSS text-shadow pseudo-
+      layers. At rest: clean. On hover: the ghost channels drift apart.
+      A subtle clip animation runs continuously once triggered.               */
 
 .name-heading {
-  transition: text-shadow 0.08s ease;
+    transition: text-shadow 0.08s ease;
 }
 
 .name-heading:hover {
-  text-shadow:
-    -2px 0   rgba(204,  51, 32,  0.65),   /* red channel left  */
-     2px 0   rgba(  0,  0, 145,  0.5);    /* French blue channel right */
-  /* animation: glitch-name 2.4s infinite; */
+    text-shadow:
+        -2px 0   rgba(204,  51, 32,  0.65),   /* red channel left  */
+          2px 0   rgba(  0,  0, 145,  0.5);    /* French blue channel right */
+    /* animation: glitch-name 2.4s infinite; */
 }
 
 @keyframes glitch-name {
-  0%,  90%  { text-shadow: -2px 0 rgba(204,51,32,0.65),   2px 0 rgba(0,0,145,0.5); }
-  91%        { text-shadow: -4px 0 rgba(204,51,32,0.8),    3px 1px rgba(0,0,145,0.6);  clip-path: inset(20% 0 60% 0); }
-  92%        { text-shadow:  3px 0 rgba(204,51,32,0.8),   -3px 0 rgba(0,0,145,0.6);  clip-path: inset(60% 0 10% 0); }
-  93%        { text-shadow: -2px 0 rgba(204,51,32,0.65),   2px 0 rgba(0,0,145,0.5);   clip-path: none; }
-  100%       { text-shadow: -2px 0 rgba(204,51,32,0.65),   2px 0 rgba(0,0,145,0.5); }
+    0%,  90%  { text-shadow: -2px 0 rgba(204,51,32,0.65),   2px 0 rgba(0,0,145,0.5); }
+    91%        { text-shadow: -4px 0 rgba(204,51,32,0.8),    3px 1px rgba(0,0,145,0.6);  clip-path: inset(20% 0 60% 0); }
+    92%        { text-shadow:  3px 0 rgba(204,51,32,0.8),   -3px 0 rgba(0,0,145,0.6);  clip-path: inset(60% 0 10% 0); }
+    93%        { text-shadow: -2px 0 rgba(204,51,32,0.65),   2px 0 rgba(0,0,145,0.5);   clip-path: none; }
+    100%       { text-shadow: -2px 0 rgba(204,51,32,0.65),   2px 0 rgba(0,0,145,0.5); }
 }
 
 
 /* 9d. Red bar — glitch stutter
-   ─────────────────────────────────────────────────────────────────────────
-   The panel-bar normally scales from 0 → 1 smoothly. On active panels
-   we override the transition with a stepped glitch-jump keyframe instead. */
+      ─────────────────────────────────────────────────────────────────────────
+      The panel-bar normally scales from 0 → 1 smoothly. On active panels
+      we override the transition with a stepped glitch-jump keyframe instead. */
 
 .panel.active .panel-bar {
-  transform: scaleX(1);
-  transform-origin: left;
-  animation: bar-glitch 0.45s cubic-bezier(0.22,1,0.36,1) both;
+    transform: scaleX(1);
+    transform-origin: left;
+    animation: bar-glitch 0.45s cubic-bezier(0.22,1,0.36,1) both;
 }
 
 @keyframes bar-glitch {
-  0%   { transform: scaleX(0);    opacity: 1; }
-  30%  { transform: scaleX(0.55); opacity: 0.4; }
-  31%  { transform: scaleX(0.3);  opacity: 1; }
-  55%  { transform: scaleX(0.8);  opacity: 0.6; }
-  56%  { transform: scaleX(0.65); opacity: 1; }
-  100% { transform: scaleX(1);    opacity: 1; }
+    0%   { transform: scaleX(0);    opacity: 1; }
+    30%  { transform: scaleX(0.55); opacity: 0.4; }
+    31%  { transform: scaleX(0.3);  opacity: 1; }
+    55%  { transform: scaleX(0.8);  opacity: 0.6; }
+    56%  { transform: scaleX(0.65); opacity: 1; }
+    100% { transform: scaleX(1);    opacity: 1; }
 }
 
 
 /* 9e. Panel transition — scan-line wipe
-   ─────────────────────────────────────────────────────────────────────────
-   Panels fade in with a brief horizontal clip-path wipe that mimics a
-   CRT beam redrawing the screen, rather than a clean CSS opacity fade.    */
+      ─────────────────────────────────────────────────────────────────────────
+      Panels fade in with a brief horizontal clip-path wipe that mimics a
+      CRT beam redrawing the screen, rather than a clean CSS opacity fade.    */
 
 .panel {
-  transition: none; /* override the smooth fade from §5 */
+    transition: none; /* override the smooth fade from §5 */
 }
 
 .panel.active {
-  animation: panel-wipe 0.28s steps(8, end) both;
+    animation: panel-wipe 0.28s steps(8, end) both;
 }
 
 @keyframes panel-wipe {
-  0%   { opacity: 0; clip-path: inset(0 100% 0 0); }
-  40%  { opacity: 1; clip-path: inset(0 60%  0 0); }
-  70%  { opacity: 1; clip-path: inset(0 15%  0 0); }
-  85%  { opacity: 1; clip-path: inset(0 25%  0 0); } /* stutter back */
-  100% { opacity: 1; clip-path: inset(0 0    0 0); }
+    0%   { opacity: 0; clip-path: inset(0 100% 0 0); }
+    40%  { opacity: 1; clip-path: inset(0 60%  0 0); }
+    70%  { opacity: 1; clip-path: inset(0 15%  0 0); }
+    85%  { opacity: 1; clip-path: inset(0 25%  0 0); } /* stutter back */
+    100% { opacity: 1; clip-path: inset(0 0    0 0); }
 }
 
 
 /* 9f. Glitch text flicker
-   ─────────────────────────────────────────────────────────────────────────
-   Applied briefly by JS to .hl words on mouseenter, then removed.
-   Creates a jitter effect before the panel settles in.                    */
+      ─────────────────────────────────────────────────────────────────────────
+      Applied briefly by JS to .hl words on mouseenter, then removed.
+      Creates a jitter effect before the panel settles in.                    */
 
 @keyframes text-glitch {
-  /* Subtle: just a brief opacity dip and a 1px nudge — no clip-path */
-  0%   { opacity: 1;   transform: translate(0, 0); }
-  25%  { opacity: 0.7; transform: translate(-1px, 0); }
-  75%  { opacity: 0.9; transform: translate(0, 0); }
-  100% { opacity: 1;   transform: translate(0, 0); }
+    /* Subtle: just a brief opacity dip and a 1px nudge — no clip-path */
+    0%   { opacity: 1;   transform: translate(0, 0); }
+    25%  { opacity: 0.7; transform: translate(-1px, 0); }
+    75%  { opacity: 0.9; transform: translate(0, 0); }
+    100% { opacity: 1;   transform: translate(0, 0); }
 }
 
 .hl-glitch {
-  animation: text-glitch 0.18s ease both;
-  color: var(--red);
+    animation: text-glitch 0.18s ease both;
+    color: var(--red);
 }
 
 
 /* 9g. Cursor trail dot
-   ─────────────────────────────────────────────────────────────────────────
-   A small red square injected by JS that follows the cursor and fades out.
-   Positioned fixed, moved via JS transform on mousemove.                  */
+      ─────────────────────────────────────────────────────────────────────────
+      A small red square injected by JS that follows the cursor and fades out.
+      Positioned fixed, moved via JS transform on mousemove.                  */
 
 .cursor-trail {
-  position: fixed;
-  width: 4px;
-  height: 4px;
-  background: var(--red);
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0;
-  transform: translate(-50%, -50%);
-  transition: opacity 0.05s;
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background: var(--red);
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.05s;
 }
 
 .cursor-trail.visible {
-  opacity: 0.7;
-  animation: trail-fade 0.5s ease forwards;
+    opacity: 0.7;
+    animation: trail-fade 0.5s ease forwards;
 }
 
 @keyframes trail-fade {
-  0%   { opacity: 0.7; transform: translate(-50%,-50%) scale(1); }
-  100% { opacity: 0;   transform: translate(-50%,-50%) scale(2); }
+    0%   { opacity: 0.7; transform: translate(-50%,-50%) scale(1); }
+    100% { opacity: 0;   transform: translate(-50%,-50%) scale(2); }
 }
 
 
 /* ==========================================================================
-   10. Motto — 諸行無常 (shōgyō mujō)
-   ==========================================================================
-   Personal motto displayed as UTF-8 hex bytes matching the email signature.
-   Lives in the default (portrait) panel, centred below the photo frame.
-   The kanji is hidden by default and revealed on hover.
-   The glitch layer in main.js also occasionally corrupts this block.
-   ========================================================================== */
+      10. Motto — 諸行無常 (shōgyō mujō)
+      ==========================================================================
+      Personal motto displayed as UTF-8 hex bytes matching the email signature.
+      Lives in the default (portrait) panel, centred below the photo frame.
+      The kanji is hidden by default and revealed on hover.
+      The glitch layer in main.js also occasionally corrupts this block.
+      ========================================================================== */
 
 .motto {
-  position: absolute;
-  bottom: 3rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: default;
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: default;
 }
 
 /* Hex block — styled to match the email signature exactly */
 .motto-hex {
-  font-family: var(--mono);
-  font-size: 0.42rem;
-  line-height: 1.5;
-  letter-spacing: 0.04em;
-  color: var(--rule);           /* very quiet at rest */
-  white-space: pre;
-  transition: color 0.2s ease;
-  user-select: none;
-  text-align: center;
+    font-family: var(--mono);
+    font-size: 0.42rem;
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    color: var(--rule);           /* very quiet at rest */
+    white-space: pre;
+    transition: color 0.2s ease;
+    user-select: none;
+    text-align: center;
 }
 
 .motto:hover .motto-hex {
-  color: var(--mid);            /* becomes legible on hover */
+    color: var(--mid);            /* becomes legible on hover */
 }
 
 /* Kanji — hidden until hover, slides up softly into view */
 .motto-kanji {
-  font-family: var(--sans);
-  font-size: 1.1rem;
-  font-weight: 300;
-  letter-spacing: 0.2em;
-  color: var(--red);
-  opacity: 0;
-  transform: translateY(5px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  user-select: none;
+    font-family: var(--sans);
+    font-size: 1.1rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--red);
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    user-select: none;
 }
 
 .motto:hover .motto-kanji {
-  opacity: 1;
-  transform: translateY(0);
+    opacity: 1;
+    transform: translateY(0);
 }

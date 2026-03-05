@@ -274,10 +274,10 @@ All panels occupy the same space — the entire right column — using `position
 ### 4.2 The switching logic
 
 ```javascript
-var hls         = document.querySelectorAll('.hl');
-var panels      = document.querySelectorAll('.panel');
+var hls          = document.querySelectorAll('.hl');
+var panels       = document.querySelectorAll('.panel');
 var defaultPanel = document.getElementById('panel-default');
-var flightRaf   = null; // explained in section 7
+var flightRaf    = null; // explained in section 7
 
 function showPanel(id) {
   panels.forEach(function (p) { p.classList.remove('active'); });
