@@ -1,6 +1,6 @@
-# Building A Personal Site — A Complete Programming Walkthrough
+# Building A Personal Site—A Complete Programming Walkthrough
 
-This guide explains how to build this site from scratch, in the order you would actually write it. Every design decision, algorithm, and technique is explained. No prior knowledge of D3 or calendar arithmetic is assumed.
+This guide explains how to build this site from scratch, in the order you would actually write it. Every design decision, algorithm, and technique is explained in full detail. No prior knowledge of D3 or SVG geometry is assumed.
 
 ---
 
@@ -11,10 +11,10 @@ This guide explains how to build this site from scratch, in the order you would 
 3. [**CSS design system**](#3-css-design-system)
 4. [**The panel switching system**](#4-the-panel-switching-system)
 5. [**Each panel, one by one**](#5-each-panel-one-by-one)
-6. [**The French Republican Calendar**](#6-the-french-republican-calendar)
-7. [**The D3 flight animation**](#7-the-d3-flight-animation)
+6. [**The D3 flight animation**](#6-the-d3-flight-animation)
+7. [**The espresso extraction dial**](#7-the-espresso-extraction-dial)
 8. [**The glitch and net-art layer**](#8-the-glitch-and-net-art-layer)
-9. [**The motto — 諸行無常**](#9-the-motto--諸行無常)
+9. [**The motto—諸行無常**](#9-the-motto--諸行無常)
 10. [**Entrance animations**](#10-entrance-animations)
 11. [**Deployment to GitHub Pages**](#11-deployment-to-github-pages)
 12. [**Swapping in real assets**](#12-swapping-in-real-assets)
@@ -25,27 +25,31 @@ This guide explains how to build this site from scratch, in the order you would 
 
 Before writing a single line, it helps to understand the governing constraints, because they explain every decision that follows.
 
-**Bauhaus / Dieter Rams principles applied to the web:**
-- One accent colour only (`#cc3320`, signal red). Everything else is near-black, off-white, or mid-grey.
-- No decorative elements other than 1px hairline rules.
-- Typography carries all the hierarchy. No icons, no gradients, no shadows.
-- Visual weight communicates meaning. A solid black chip means *mastered*. An outlined chip means *proficient*. No numbers needed.
+### 1.1 Bauhaus / Dieter Rams principles applied to the web
 
-**Glitch / net-art layer on top:**
-- The Bauhaus structure is the skeleton. The glitch effects are the surface occasionally misbehaving.
-- All glitch code is additive — removing it restores the clean site completely.
+Dieter Rams distilled good design into ten principles, most of which reduce to: *remove everything that isn't doing necessary work.* Applied to a personal site:
 
-**File structure:**
+- **One accent colour only** (`#cc3320`, signal red). Everything else is near-black, off-white, or mid-grey. A second accent colour would dilute the signal.
+- **No decorative elements other than 1px hairline rules.** No drop shadows, no gradients, no rounded corners, no icons. The hairline rule is the only flourish—and it serves a structural purpose, separating sections and extending index labels.
+- **Typography carries all the hierarchy.** Size, weight, case, and tracking do all the work. There are exactly four typographic registers used throughout, described in section 3.3.
+- **Visual weight communicates meaning directly.** A solid black chip means *mastered*. An outlined chip means *proficient*. A ghost chip means *exploring*. No numbers, no percentage bars.
+
+### 1.2 Glitch / net-art layer on top
+
+The Bauhaus structure is the skeleton. The glitch effects—scan lines, text scramble, chromatic aberration, cursor trail—are the surface occasionally misbehaving. They are entirely additive: removing section 4 of `main.js` and section 9 of `style.css` restores the clean site completely. Nothing in the core layout depends on them.
+
+The tension between rigorous structure and unstable surface is intentional. The Bauhaus principles enforce discipline; the glitch layer breaks it in controlled ways.
+
+### 1.3 File structure
 
 ```
 personal-site/
-  index.html    — markup only; no inline styles or scripts
-  style.css     — all styles, organised by section
-  main.js       — all JavaScript, wrapped in a single IIFE
+  index.html   —markup only; no inline styles or scripts
+  style.css    —all styles, organised by numbered section
+  main.js      —all JavaScript, wrapped in a single IIFE
   assets/
-    portrait.jpg  — main profile photo
-    cdmx.jpg      — childhood photo (Mexico City panel)
-    kyudo.gif     — kyūdō practice animation
+    portrait.jpg —main profile photo (default panel)
+    cdmx.jpg     —childhood photo (Mexico City panel)
 ```
 
 Three files. No build tools, no frameworks, no npm. It opens with `file://` in a browser and deploys by pushing to GitHub.
@@ -62,37 +66,38 @@ Three files. No build tools, no frameworks, no npm. It opens with `file://` in a
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sebastián · NYC</title>
+  <title>Sebastián</title>
 
-  <!-- Fonts loaded from Google Fonts before anything renders -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="style.css" />
 
-  <!-- D3 must load before main.js runs, so it goes in <head> not before </body> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 </head>
 ```
 
-**Why `preconnect` for Google Fonts?** The browser opens the TCP connection to `fonts.googleapis.com` and `fonts.gstatic.com` early, before it even knows which fonts it needs. This shaves ~100–300ms off first paint on a cold connection.
+**Why `preconnect` for Google Fonts?**
+The browser needs to open a TCP connection, perform a TLS handshake, and send an HTTP request before it can download any font file. `preconnect` tells the browser to do all of that work speculatively—before it even knows which fonts are needed—so by the time the CSS `@font-face` declarations are parsed, the connection is already warm. On a cold connection this saves roughly 100–300ms of first-paint latency.
 
-**Why IBM Plex?** It has a Sans and Mono variant that are designed to work together — same x-height, compatible proportions. IBM Plex Sans handles body text; IBM Plex Mono handles all labels, codes, indices, and captions, creating a clear visual register distinction without needing size or weight changes.
+Two separate `preconnect` hints are needed because Google Fonts serves its CSS from `fonts.googleapis.com` but its actual font files from `fonts.gstatic.com`. Without the second hint, the font files themselves would still incur a cold connection.
 
-**Why D3 in `<head>`?** Normally you'd put scripts before `</body>` to avoid blocking render. But D3 must be available before `main.js` runs, and `main.js` is loaded before `</body>`. If both were at the end, execution order would still be correct. D3 in `<head>` is a defensive choice — it ensures D3 is definitely available no matter when `main.js` executes.
+**Why IBM Plex?**
+IBM Plex Sans and IBM Plex Mono were designed as a matched pair: same x-height, compatible optical weight, designed to coexist on the same page without one dominating the other. The distinction between sans (body text, headings) and mono (all labels, codes, indices, captions) creates a clear visual register hierarchy without requiring any size or weight changes.
+
+**Why D3 in `<head>` rather than before `</body>`?**
+Normally you'd put scripts before `</body>` to avoid blocking render. But D3 must be available before `main.js` executes, and `main.js` is loaded before `</body>`. If both scripts were at the end, execution order would still be correct. D3 in `<head>` is a defensive choice—it guarantees D3 is defined regardless of how the page is assembled or cached, and the performance cost is negligible for a library served from Cloudflare's CDN.
 
 ### 2.2 The two-column layout
 
 ```html
 <body>
 <div class="site">
-  <div class="left">  <!-- biography -->  </div>
-  <div class="right"> <!-- panels -->    </div>
+  <div class="left">   <!-- biography -->  </div>
+  <div class="right">  <!-- panels -->     </div>
 </div>
 ```
-
-The `.site` div is a CSS grid with two equal columns:
 
 ```css
 .site {
@@ -100,20 +105,43 @@ The `.site` div is a CSS grid with two equal columns:
   grid-template-columns: 1fr 1fr;
   height: 100vh;
 }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
 ```
 
-`1fr 1fr` means "each column gets one equal fraction of the available space." `height: 100vh` makes the grid fill exactly the viewport — no scroll. `overflow: hidden` on `html, body` enforces this.
+`grid-template-columns: 1fr 1fr` means "divide available width into two equal fractions." Unlike `width: 50%`, fractional units account for gaps and don't overflow their container.
 
-### 2.3 The script tag placement and Cloudflare
+`height: 100vh` makes the grid exactly fill the viewport height. `overflow: hidden` on `html` and `body` enforces the no-scroll rule—the site is deliberately a single screen. There is no content below the fold; everything is accessed through the hover system.
+
+The left column gets `border-right: 1px solid var(--black)`—the only border in the layout. It acts as a visible seam between the two halves.
+
+### 2.3 The hoverable word system
+
+Every interactive word in the biography is a `<span>` with two attributes:
+
+```html
+<span class="hl" data-panel="professor">professor</span>
+```
+
+`class="hl"`—marks it for styling and event binding. CSS gives it a dotted red underline at rest and a solid red underline when active. JavaScript binds `mouseenter` and `mouseleave` events to the whole set.
+
+`data-panel="professor"`—a `data-*` attribute stores the panel identifier. JavaScript reads `element.dataset.panel` to know which panel to show. The naming convention is direct: `data-panel="professor"` activates `id="panel-professor"`.
+
+This is a clean separation of concerns: the HTML describes *what* the word is connected to; the JavaScript describes *how* that connection behaves; the CSS describes *how it looks*.
+
+### 2.4 The script tag and Cloudflare
 
 ```html
 <script data-cfasync="false" src="main.js"></script>
 </body>
 ```
 
-The script goes right before `</body>` so the DOM is fully parsed when it runs. `document.querySelectorAll('.hl')` works correctly because every `.hl` element exists before the script evaluates.
+The script is placed immediately before `</body>` so the entire DOM is parsed and available before the script executes. `document.querySelectorAll('.hl')` works correctly because every `.hl` element already exists at that point.
 
-`data-cfasync="false"` is a Cloudflare-specific attribute. When a site is hosted behind Cloudflare (common with GitHub Pages through a custom domain), Cloudflare's CDN injects an email-obfuscation script to protect email addresses in the HTML from scrapers. This injected script fails in sandboxed iframes and blocks all subsequent JavaScript execution. The `data-cfasync="false"` attribute tells Cloudflare not to inject its script relative to this tag.
+`data-cfasync="false"` prevents a Cloudflare-specific problem. When a site sits behind Cloudflare's CDN (common with GitHub Pages through a custom domain), Cloudflare automatically injects an email-obfuscation script before any `<script>` tag it finds. This injected script has two problems: it fails in sandboxed iframes, and it blocks subsequent script execution. Adding `data-cfasync="false"` tells Cloudflare to skip injection for that element.
 
 ---
 
@@ -121,24 +149,24 @@ The script goes right before `</body>` so the DOM is fully parsed when it runs. 
 
 ### 3.1 Custom properties (design tokens)
 
-The entire colour palette and type stack live in `:root` as CSS custom properties:
+All values that appear in more than one place live in `:root` as CSS custom properties:
 
 ```css
 :root {
-  --black: #0c0c0c;   /* Near-black — slightly warm, not pure #000 */
-  --white: #f4f3ef;   /* Warm off-white — slightly cream           */
-  --mid:   #6e6e6e;   /* Mid-grey for secondary labels             */
-  --rule:  #d0cfc9;   /* Light warm-grey for hairline rules        */
-  --red:   #cc3320;   /* Signal red — the single accent            */
+  --black: #0c0c0c;   /* Near-black—warm, not pure #000  */
+  --white: #f4f3ef;   /* Warm off-white—slightly cream   */
+  --mid:   #6e6e6e;   /* Mid-grey for secondary labels     */
+  --rule:  #d0cfc9;   /* Warm light-grey for hairline rules */
+  --red:   #cc3320;   /* Signal red—the single accent    */
 
   --sans: 'IBM Plex Sans', Helvetica, sans-serif;
   --mono: 'IBM Plex Mono', monospace;
 }
 ```
 
-Using `--black: #0c0c0c` instead of `#000000` and `--white: #f4f3ef` instead of `#ffffff` makes the site feel warmer and less digital — closer to ink on paper. Pure black and white on screen look harsh and clinical.
+**Why `#0c0c0c` instead of `#000000`?** Pure black on screen has a harshness that pure black ink on paper does not. `#0c0c0c` is slightly warm, slightly lifted—closer to the appearance of dense ink on off-white stock. The same logic applies to `#f4f3ef` instead of `#ffffff`. The warmth in both values is coordinated so they feel like they belong together.
 
-Using custom properties instead of hardcoded values means you can change the entire palette by editing six lines.
+**Why custom properties over Sass variables?** Custom properties are resolved at runtime, not compile time. This means they work in vanilla CSS without any build step, they can be overridden by media queries or JavaScript, and they appear in the browser's DevTools where you can modify them live.
 
 ### 3.2 Reset
 
@@ -150,34 +178,40 @@ Using custom properties instead of hardcoded values means you can change the ent
 }
 ```
 
-`box-sizing: border-box` makes `width` and `height` include padding and borders, which is almost always what you want. Without it, adding `padding: 1rem` to a `width: 100%` element overflows its container.
+`box-sizing: border-box` changes how `width` and `height` are calculated. By default (content-box), if you set `width: 200px` and then add `padding: 1rem`, the element becomes 232px wide. With `border-box`, the element stays 200px and the content area shrinks to accommodate the padding. This is almost always what you want—it makes layout arithmetic predictable.
+
+`margin: 0; padding: 0` removes browser default spacing. `<h1>` elements have browser-default top/bottom margin; `<p>` elements have browser-default bottom margin. Resetting to zero gives you a blank slate and makes the page behave identically across browsers.
 
 ### 3.3 Typography hierarchy
 
-There are exactly four typographic registers, used consistently throughout:
+There are exactly four typographic registers. Every text element on the site falls into one of these four buckets:
 
-| Register | Properties | Used for |
-|---|---|---|
-| Heading | IBM Plex Sans, 500 weight, uppercase, tight tracking | Name, panel titles |
-| Body | IBM Plex Sans, 300 weight, 1.85 line-height | Bio paragraphs |
-| Index | IBM Plex Mono, 0.55rem, 0.18em letter-spacing, uppercase | Section numbers, panel labels |
-| Caption | IBM Plex Mono, 0.52–0.58rem, 0.1em tracking | Course codes, degree years, footer links |
+| Register | Font | Size | Weight | Case | Tracking | Used for |
+|---|---|---|---|---|---|---|
+| Heading | IBM Plex Sans | `clamp(2.2rem, 4vw, 3.4rem)` | 500 | uppercase | −0.04em | Name, panel titles |
+| Body | IBM Plex Sans | `clamp(0.9rem, 1.5vw, 1.25rem)` | 300 | normal | −0.005em | Bio paragraphs |
+| Index | IBM Plex Mono | 0.55rem | 400 | uppercase | 0.18em | Section numbers, panel labels |
+| Caption | IBM Plex Mono | 0.52–0.58rem | 400 | varies | 0.08–0.14em | Course codes, degree years, footer links |
 
-`clamp()` is used for fluid font sizing:
+The `clamp()` function produces fluid font sizes:
 
 ```css
 font-size: clamp(2.2rem, 4vw, 3.4rem);
 ```
 
-This means: *never smaller than 2.2rem, never larger than 3.4rem, and proportional to the viewport width in between.* The heading scales smoothly as the window resizes without any media queries.
+This reads: *never smaller than 2.2rem, never larger than 3.4rem, scale proportionally to viewport width in between.* At a typical 1440px viewport, `4vw` is 57.6px ≈ 3.6rem, which gets clamped to 3.4rem. At 800px it's 32px ≈ 2rem, which gets clamped up to 2.2rem. The heading scales smoothly between these limits with zero media queries.
+
+**Why tight tracking (negative letter-spacing) on headings?** At large sizes, the default letter-spacing creates visually uneven gaps. Pulling the letters slightly closer together makes the heading read as a single cohesive unit rather than a sequence of individual letters. `−0.04em` is relative to the current font size, so it scales correctly at any size.
+
+**Why wide tracking on mono labels?** Small-caps mono text at 0.55rem needs extra spacing to remain legible at that size. `0.18em` is generous but the short string lengths (e.g., "01 / README.md") mean it never looks spaced-out.
 
 ### 3.4 The index strip pattern
 
-A recurring pattern throughout the site is a small label followed by a horizontal rule that extends to fill remaining space:
+The most-reused structural pattern on the site: a small label followed by a hairline rule that extends to fill the remaining width.
 
 ```html
 <div class="left-index">
-  <span class="left-index-label">01 / Biography</span>
+  <span class="left-index-label" id="left-index-label">01 / README.md</span>
   <div class="left-index-rule"></div>
 </div>
 ```
@@ -188,18 +222,27 @@ A recurring pattern throughout the site is a small label followed by a horizonta
   align-items: center;
   gap: 1rem;
 }
+
 .left-index-rule {
-  flex: 1;         /* fills all remaining horizontal space */
+  flex: 1;       /* this is the entire trick */
   height: 1px;
   background: var(--rule);
 }
 ```
 
-`flex: 1` on the rule div tells flexbox to give it all the leftover space after the label has been sized. This is the entire trick — one property.
+`flex: 1` is shorthand for `flex-grow: 1; flex-shrink: 1; flex-basis: 0`. The `flex-grow: 1` part tells the browser to give this element all remaining space after the label has been sized. No matter how wide the container is or how long the label is, the rule always extends to the right edge.
 
-The same pattern is used for `.panel-index` inside every right-column panel, using `::after` instead of a separate element:
+The `id="left-index-label"` attribute is also what the glitch layer targets for its periodic corruption effect (see section 8.7).
+
+The same pattern is used inside every right-column panel via a CSS `::after` pseudo-element, avoiding the need for an extra HTML element:
 
 ```css
+.panel-index {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .panel-index::after {
   content: '';
   flex: 1;
@@ -208,26 +251,28 @@ The same pattern is used for `.panel-index` inside every right-column panel, usi
 }
 ```
 
+`content: ''` is required—pseudo-elements don't render without it, even if they're empty strings.
+
 ### 3.5 The chip system
 
-Proficiency is communicated through visual weight rather than numbers. Three chip variants:
+Proficiency is communicated through visual weight rather than numbers. Three variants:
 
 ```css
-/* Fully mastered — solid fill, white text */
+/* Fully mastered—maximum visual weight */
 .chip-solid {
   background: var(--black);
   color: var(--white);
   border: 1px solid var(--black);
 }
 
-/* Working knowledge — outline only */
+/* Working knowledge—present but not filled */
 .chip-outline {
   background: transparent;
   color: var(--black);
   border: 1px solid var(--black);
 }
 
-/* Early-stage — ghost, grey text */
+/* Early-stage / exploring—minimal presence */
 .chip-ghost {
   background: transparent;
   color: var(--mid);
@@ -235,32 +280,23 @@ Proficiency is communicated through visual weight rather than numbers. Three chi
 }
 ```
 
-No `border-radius`. Bauhaus doesn't round corners.
+The base chip is rectangular with no `border-radius`. Bauhaus doesn't round corners—rounded corners imply softness and approachability, which conflicts with the architectural rigour of the aesthetic. Sharp corners read as precise and deliberate.
 
----
+### 3.6 Panel stacking with `position: absolute; inset: 0`
 
-## 4. The panel switching system
-
-This is the core JavaScript mechanism. Every interactive word in the biography is a `<span>` with two attributes:
-
-```html
-<span class="hl" data-panel="professor">professor</span>
-```
-
-`class="hl"` — styles it with a dotted underline, cursor crosshair, and red-on-hover treatment.
-
-`data-panel="professor"` — links it to `id="panel-professor"` on the right side.
-
-### 4.1 Panel stacking
-
-All panels occupy the same space — the entire right column — using `position: absolute; inset: 0`:
+All right-column panels share the same space using absolute positioning:
 
 ```css
+.right {
+  position: relative;   /* establishes the containing block */
+  overflow: hidden;
+}
+
 .panel {
   position: absolute;
-  inset: 0;              /* shorthand for top:0; right:0; bottom:0; left:0 */
+  inset: 0;             /* shorthand: top: 0; right: 0; bottom: 0; left: 0 */
   opacity: 0;
-  pointer-events: none;  /* invisible panels are click-through */
+  pointer-events: none;
 }
 
 .panel.active {
@@ -269,16 +305,51 @@ All panels occupy the same space — the entire right column — using `position
 }
 ```
 
-`.right` has `position: relative; overflow: hidden` to act as the containing block for all the absolutely positioned panels.
+`inset: 0` makes every panel fill the entire `.right` div—they're stacked on top of each other like a deck of cards. Only the `.active` one is visible.
 
-### 4.2 The switching logic
+`pointer-events: none` on inactive panels is critical. Without it, invisible panels would still intercept mouse events, causing hover and click interactions to trigger on panels the user can't see. Setting `pointer-events: none` makes invisible elements completely transparent to interaction.
+
+---
+
+## 4. The panel switching system
+
+### 4.1 The IIFE wrapper
+
+The entire `main.js` is wrapped in an Immediately Invoked Function Expression:
+
+```javascript
+(function () {
+  'use strict';
+  // ... all code ...
+})();
+```
+
+**What it does:** Creates a private function scope. Every `var` declared inside is local to this function. None of them become properties of `window`. Without the IIFE, `var hls = ...` would create `window.hls`, `var panels = ...` would create `window.panels`, etc. Any third-party script loaded on the page (D3, analytics, browser extensions) could accidentally read or overwrite them.
+
+**Why `'use strict'`?** Enables strict mode, which catches several classes of common errors at runtime:
+- Using an undeclared variable throws a `ReferenceError` instead of silently creating a global
+- Assigning to a read-only property throws a `TypeError` instead of failing silently
+- Duplicate parameter names throw a `SyntaxError`
+- `this` inside functions called without a receiver is `undefined` instead of `window`
+
+**The critical scope rule:** Any code that references variables declared inside the IIFE *must also be inside the IIFE*. Code appended after `})();` is outside the scope and cannot see `hls`, `panels`, `flightRaf`, etc. This was the source of earlier bugs—glitch code was appended outside the IIFE and threw `ReferenceError: hls is not defined`.
+
+### 4.2 Core variables
 
 ```javascript
 var hls          = document.querySelectorAll('.hl');
 var panels       = document.querySelectorAll('.panel');
 var defaultPanel = document.getElementById('panel-default');
-var flightRaf    = null; // explained in section 7
+var flightRaf    = null;
+```
 
+`querySelectorAll` returns a static `NodeList`—a snapshot of all matching elements at the moment of the call. Unlike `getElementsByClassName`, it does not update when the DOM changes, which is fine here since the panels never change after page load.
+
+`flightRaf` stores the `requestAnimationFrame` handle for the flight animation. When the user hovers away mid-flight, `reset()` calls `cancelAnimationFrame(flightRaf)` to stop the animation immediately. Without this variable, the plane would continue moving on an invisible panel.
+
+### 4.3 `showPanel` and `reset`
+
+```javascript
 function showPanel(id) {
   panels.forEach(function (p) { p.classList.remove('active'); });
   var target = document.getElementById('panel-' + id);
@@ -296,85 +367,86 @@ function reset() {
 }
 ```
 
-`showPanel` removes `.active` from every panel, then adds it to the target. `reset` does the same but targets the default panel and also cancels any in-progress flight animation.
+`showPanel` always deactivates *all* panels first, then activates the target. This is simpler and more robust than tracking which panel is currently active and only deactivating that one—no state to get out of sync.
 
-### 4.3 The hover events and the mouseleave problem
+`document.getElementById('panel-' + id)`—the naming convention makes this trivial. `data-panel="professor"` → `id="panel-professor"`. No lookup table needed.
 
-Naively, you might write:
+The `if (id === 'moved')` branch calls `runFlight()` on every hover of the "moved" word. The flight animation clears the SVG at the start of each call, so re-triggering on every hover is safe and intentional—the animation resets and replays each time.
 
-```javascript
-hl.addEventListener('mouseenter', function () { showPanel(hl.dataset.panel); });
-hl.addEventListener('mouseleave', function () { reset(); });
-```
-
-This breaks when hovering from one word directly to another — the first word fires `mouseleave`, calling `reset()`, which briefly flashes the default panel before the second word fires `mouseenter`. The fix is to check where the cursor is going:
+### 4.4 The hover events and the `relatedTarget` fix
 
 ```javascript
-hl.addEventListener('mouseleave', function (e) {
-  // e.relatedTarget is the element the cursor is entering
-  if (!e.relatedTarget || !e.relatedTarget.classList.contains('hl')) {
-    reset();
-  }
-  // If moving to another .hl, do nothing — the mouseenter on the next
-  // word will call showPanel() and handle the transition.
+hls.forEach(function (hl) {
+
+  hl.addEventListener('mouseenter', function () {
+    hls.forEach(function (h) { h.classList.remove('active'); });
+    hl.classList.add('active');
+    showPanel(hl.dataset.panel);
+  });
+
+  hl.addEventListener('mouseleave', function (e) {
+    var next = e.relatedTarget;
+    if (!next || !next.classList || !next.classList.contains('hl')) {
+      reset();
+    }
+  });
+
 });
 
-// Final safety net for when the cursor leaves the whole site
 document.querySelector('.site').addEventListener('mouseleave', reset);
 ```
 
-`e.relatedTarget` is the element the cursor moved *to* when leaving. If it's another `.hl`, we skip the reset. If it's anything else (whitespace, a different element), we reset.
+The naive implementation—`mouseleave` always calls `reset()`—has a bug. When you move the cursor directly from one `.hl` word to another, the sequence is:
 
-### 4.4 The IIFE (Immediately Invoked Function Expression)
+1. `mouseleave` fires on word A → `reset()` called → default panel shown
+2. `mouseenter` fires on word B → `showPanel()` called → new panel shown
 
-The entire `main.js` is wrapped in:
+This causes a single-frame flash of the default panel. The fix uses `e.relatedTarget`—the element the cursor is *entering*—to skip the reset when transitioning between two `.hl` words.
+
+`!next.classList` guards against the case where `relatedTarget` is `null` (cursor left the window entirely) or is a non-element node. The `.site` `mouseleave` listener handles that edge case as a safety net.
+
+### 4.5 The `showPanel` override pattern
+
+The espresso dial augments `showPanel` without modifying it directly:
 
 ```javascript
-(function () {
-  'use strict';
-  // ... all code ...
-})();
+var _origShowPanel = showPanel;
+showPanel = function (id) {
+  _origShowPanel(id);
+  if (id === 'espresso') { initDial(); }
+};
 ```
 
-This creates a private scope. Variables like `hls`, `panels`, `defaultPanel`, `flightRaf` are local to this function and never pollute `window`. Without this, every `var` declaration would become a global variable, which can cause hard-to-debug collisions if any third-party script uses the same names.
-
-`'use strict'` enables strict mode, which catches common mistakes: using undeclared variables, duplicate parameter names, writing to read-only properties, etc.
-
-**Critical rule:** Any code that references variables declared inside the IIFE must also be inside the IIFE. Code appended after `})();` is outside the scope and cannot see `hls`, `panels`, etc.
+`_origShowPanel` stores a reference to the original function. The new `showPanel` calls the original first (preserving all existing behaviour), then adds the `initDial()` call for the espresso panel. This is the **decorator pattern**—augmenting a function's behaviour without touching its source code. If section 5 (the espresso dial) were removed entirely, the original `showPanel` would be completely unaffected.
 
 ---
 
 ## 5. Each panel, one by one
 
-### 5.1 Default panel — Bauhaus geometric mark
+### 5.1 Default panel—Bauhaus geometric mark and photo frame
 
-The background SVG is built from a small set of geometric primitives — concentric circles, cross lines, diagonal lines, and a red square at the centre. It renders at 4% opacity as a texture:
+The background SVG is a Bauhaus composition: concentric circles, cross lines, diagonal lines, and a red square at the centre. It renders at 4% opacity as a texture:
 
 ```html
 <svg viewBox="0 0 120 120" aria-hidden="true">
   <circle cx="60" cy="60" r="58" stroke="#0c0c0c" stroke-width="0.5"/>
   <circle cx="60" cy="60" r="35" stroke="#0c0c0c" stroke-width="0.5"/>
   <circle cx="60" cy="60" r="12" stroke="#0c0c0c" stroke-width="0.5"/>
-  <line x1="60" y1="2"  x2="60"  y2="118" stroke="#0c0c0c" stroke-width="0.5"/>
-  <line x1="2"  y1="60" x2="118" y2="60"  stroke="#0c0c0c" stroke-width="0.5"/>
-  <line x1="18" y1="18" x2="102" y2="102" stroke="#0c0c0c" stroke-width="0.5"/>
-  <line x1="102" y1="18" x2="18" y2="102" stroke="#0c0c0c" stroke-width="0.5"/>
+  <line x1="60" y1="2"   x2="60"  y2="118" stroke="#0c0c0c" stroke-width="0.5"/>
+  <line x1="2"  y1="60"  x2="118" y2="60"  stroke="#0c0c0c" stroke-width="0.5"/>
+  <line x1="18" y1="18"  x2="102" y2="102" stroke="#0c0c0c" stroke-width="0.5"/>
+  <line x1="102" y1="18" x2="18"  y2="102" stroke="#0c0c0c" stroke-width="0.5"/>
   <rect x="55" y="55" width="10" height="10" stroke="#cc3320" stroke-width="0.8"/>
 </svg>
 ```
 
-The photo frame uses an offset shadow technique — two absolutely positioned divs, the shadow one offset by 7px down and right:
+`aria-hidden="true"` removes the SVG from the accessibility tree. Screen readers would otherwise attempt to describe it, which is meaningless noise. Any purely decorative element should carry this attribute.
 
-```html
-<div class="default-photo-frame">
-  <div class="default-photo-shadow"></div>  <!-- offset border -->
-  <div class="default-photo-main">          <!-- actual frame -->
-    <img src="assets/portrait.jpg" ... />
-  </div>
-</div>
-```
+The photo frame uses two absolutely positioned divs to create a shadow-border effect without CSS box shadows:
 
 ```css
+.default-photo-frame  { position: relative; width: 200px; height: 250px; }
+
 .default-photo-shadow {
   position: absolute;
   top: 7px; left: 7px; right: -7px; bottom: -7px;
@@ -384,13 +456,17 @@ The photo frame uses an offset shadow technique — two absolutely positioned di
   position: absolute;
   inset: 0;
   border: 1px solid var(--black);
-  overflow: hidden; /* clips the image */
+  overflow: hidden;
 }
 ```
 
-### 5.2 Professor panel — courses list
+`.default-photo-shadow` is offset 7px down and right. Its `right: -7px; bottom: -7px` extend it beyond the frame, making it appear to sit behind and below the main border—a shadow drawn with a hairline rule, consistent with the no-shadows rule.
 
-A two-column CSS grid: course code fixed-width on the left, name filling the right:
+`overflow: hidden` on `.default-photo-main` clips the `<img>` to the frame boundaries.
+
+### 5.2 Professor panel—courses and institutional affiliation
+
+The course list is a two-column CSS grid with hairline separators:
 
 ```css
 .course-item {
@@ -398,185 +474,101 @@ A two-column CSS grid: course code fixed-width on the left, name filling the rig
   grid-template-columns: 7rem 1fr;
   border-top: 1px solid var(--rule);
   padding: 0.85rem 0;
+  align-items: baseline;
 }
-```
 
-`border-top` on each item creates horizontal rules between rows. `border-bottom` on the last item closes the list:
-
-```css
 .course-item:last-child { border-bottom: 1px solid var(--rule); }
 ```
 
-### 5.3 Kyūdō panel — archery target
+`align-items: baseline` aligns the two columns on their text baseline rather than their top edges—this looks more typographically correct when the columns have different font sizes or weights.
 
-The concentric ring target is an inline SVG — five circles of decreasing radius, the innermost two in red, with crosshair lines through the centre:
-
-```html
-<svg viewBox="0 0 200 200">
-  <circle cx="100" cy="100" r="98" stroke="#0c0c0c" stroke-width="0.5"/>
-  <circle cx="100" cy="100" r="78" stroke="#0c0c0c" stroke-width="0.5"/>
-  <circle cx="100" cy="100" r="58" stroke="#0c0c0c" stroke-width="0.5"/>
-  <circle cx="100" cy="100" r="38" stroke="#0c0c0c" stroke-width="0.5"/>
-  <circle cx="100" cy="100" r="18" stroke="#cc3320" stroke-width="0.8"/>
-  <circle cx="100" cy="100" r="5"  fill="#cc3320" opacity="0.6"/>
-  <line x1="100" y1="2"  x2="100" y2="198" stroke="#0c0c0c" stroke-width="0.3"/>
-  <line x1="2"  y1="100" x2="198" y2="100" stroke="#0c0c0c" stroke-width="0.3"/>
-</svg>
-```
-
-This renders at 8% opacity as a background texture. The foreground content (kanji, label, media frame) sits on top via `position: relative; z-index: 1`.
-
-To swap the placeholder for a real gif or video, replace the `.kyudo-placeholder` div:
+The affiliation footer uses a middot separator:
 
 ```html
-<!-- Option A — gif -->
-<img src="assets/kyudo.gif" alt="Kyūdō practice" class="kyudo-media" />
-
-<!-- Option B — video (autoplay, loop, muted is required for autoplay to work) -->
-<video src="assets/kyudo.mp4" autoplay loop muted class="kyudo-media"></video>
-```
-
-### 5.4 Language panels
-
-Each language panel follows an identical structure:
-
-```html
-<div class="panel lang-panel" id="panel-lang-ja">
-  <div class="panel-bar"></div>
-  <div class="lang-badge" aria-hidden="true">日</div>   <!-- large ghosted character -->
-  <div class="lang-index">Japanese / 日本語</div>
-  <p class="lang-bio">
-    ... translated bio ...
-    <span class="lang-word">外国語の学習</span>
-    ... rest of bio ...
-  </p>
-  <div class="lang-footer">
-    <a href="...">GitHub</a>
-    <a href="...">メール</a>
-  </div>
+<div class="prof-affil">
+  <span class="prof-affil-item">NYU Tandon</span>
+  <span class="prof-affil-dot">&middot;</span>
+  <span class="prof-affil-item">NYU Courant</span>
 </div>
 ```
 
-The `.lang-badge` is a large character positioned in the top-right corner at 4% opacity — decorative, never interactive, `aria-hidden="true"` so screen readers skip it.
+`&middot;` (`·`) is a centered dot used conventionally to separate items of equal status. The CSS colours it in `var(--rule)`—lighter than the text on either side—so it reads as a pause rather than punctuation.
 
-`.lang-word` highlights a key phrase in red with a red border-bottom, marking the translated equivalent of the bio's interactive word.
+### 5.3 Developer and music panels—chip rows
 
-Special characters in the bio text are HTML-encoded to be safe across all encodings. For example, `&#12371;` instead of `こ`. This is defensive practice — it works even if the file is served with the wrong character encoding header.
+Both panels use the same chip row structure: a fixed-width tier label on the left, a wrapping group of chips on the right:
+
+```css
+.chip-row {
+  border-top: 1px solid var(--rule);
+  padding: 0.85rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chip-row-label {
+  width: 5.5rem;
+  flex-shrink: 0;    /* prevents label from squishing if chips wrap */
+}
+
+.chip-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+```
+
+`flex-shrink: 0` on the label is important. Flexbox will try to shrink all items proportionally when space is tight. The label should stay at its fixed width; only the chips should wrap. `flex-shrink: 0` opts it out of the shrinking algorithm.
+
+`flex-wrap: wrap` on `.chip-items` allows chips to flow onto a new line if the panel is too narrow—responsive layout without media queries.
+
+### 5.4 Language panels—Japanese, Czech, Classical Latin
+
+Each panel follows the same structure: a large ghosted initial letter, an index label, a translated bio paragraph, and footer links in the target language.
+
+The `.lang-badge` is a large character positioned in the top-right corner at 4% opacity. `aria-hidden="true"` marks it decorative—it's redundant with the `lang-index` label above it.
+
+`.lang-word` highlights the translated equivalent of the bio's trigger word in red with a red border-bottom. It's a visual callback to the `.hl` underline system—the same word, in a different language, with the same visual weight.
+
+### 5.5 Contact panel
+
+Three links styled as full-width rows with the handle right-aligned:
+
+```css
+.contact-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-top: 1px solid var(--rule);
+  padding: 0.95rem 0;
+  text-decoration: none;
+  color: var(--black);
+  transition: color 0.12s;
+}
+
+.contact-link:hover { color: var(--red); }
+```
+
+`justify-content: space-between` pushes the platform name to the left and the handle to the right. `align-items: baseline` aligns the two on their text baselines—important because the platform name is larger than the handle.
 
 ---
 
-## 6. The French Republican Calendar
+## 6. The D3 flight animation
 
-This is the most algorithmically interesting part of the site. The Republican Calendar was adopted during the French Revolution and used from 1793 to 1805. Each year starts at the autumnal equinox (approximately 22 September Gregorian), has twelve 30-day months each named after a natural phenomenon, and ends with five (or six in leap years) complementary days.
+D3 (Data-Driven Documents) is a JavaScript library for binding data to SVG elements and animating transitions. Here it handles one specific task: drawing and animating a curved flight path from Mexico City to New York.
 
-Every day also has a name — a plant, animal, mineral, or tool — assigned by the poet Fabre d'Églantine.
+### 6.1 Why D3 rather than plain SVG?
 
-### 6.1 The Julian Day Number
+For this animation, D3 adds three things plain SVG/JS doesn't have out of the box:
 
-To convert between calendar systems, we use Julian Day Numbers (JDN) — a continuous count of days since 1 January 4713 BCE. Any calendar date can be converted to a JDN, and JDNs can be subtracted to find the difference in days between any two dates.
+1. **Transition system**—`.transition().duration(2200).ease(d3.easeCubicInOut).attr(...)` handles the stroke-dashoffset animation with easing in one chain.
+2. **`d3.easeCubicInOut`**—a mathematically correct easing function.
+3. **Delayed transitions**—`.transition().delay(2200)` lets the city markers fade in exactly when the path arrives, without manual `setTimeout` chains.
 
-```javascript
-function jdn(y, m, d) {
-  var a  = Math.floor((14 - m) / 12);
-  var yr = y + 4800 - a;
-  var mo = m + 12 * a - 3;
-  return d
-    + Math.floor((153 * mo + 2) / 5)
-    + 365 * yr
-    + Math.floor(yr / 4)
-    - Math.floor(yr / 100)
-    + Math.floor(yr / 400)
-    - 32045;
-}
-```
+The plane animation still uses `requestAnimationFrame` directly (because it needs frame-by-frame position access via `getPointAtLength`), but the path and markers use D3's transition system throughout.
 
-This is a standard formula for the proleptic Gregorian calendar. The terms `Math.floor(yr/4) - Math.floor(yr/100) + Math.floor(yr/400)` implement the leap-year rule: divisible by 4 is a leap year, except centuries which are not, except centuries divisible by 400 which are.
-
-### 6.2 The epoch and conversion
-
-The Republican epoch — day 1 of year 1 — was 22 September 1792 Gregorian:
-
-```javascript
-var EPOCH = jdn(1792, 9, 22);
-```
-
-To find today's Republican date, compute how many days have passed since the epoch:
-
-```javascript
-function toRep(date) {
-  var days = jdn(date.getFullYear(), date.getMonth() + 1, date.getDate()) - EPOCH;
-  if (days < 0) return null;  // before the Revolution
-```
-
-Then iterate through Republican years to find which year the day falls in. Republican leap years follow the same 4/100/400 rule as Gregorian:
-
-```javascript
-  var start = 0;
-  for (var y = 1; y <= 300; y++) {
-    var len = (y % 4 === 0) ? 366 : 365;
-    if (days < start + len) {
-      var doy = days - start;  // day-of-year within this Republican year
-```
-
-Within the year, days 0–359 fall in the twelve 30-day months. Days 360–364 (or 365) are complementary days:
-
-```javascript
-      if (doy < 360) {
-        var mo  = Math.floor(doy / 30) + 1;   // month 1–12
-        var day = (doy % 30) + 1;             // day 1–30
-        return { year: y, month: mo, day: day, dayName: DN[mo][day-1] };
-      } else {
-        var c = doy - 360;
-        return { year: y, comp: true, day: c + 1, dayName: COMP[c] };
-      }
-    }
-    start += len;
-  }
-}
-```
-
-### 6.3 Roman numerals for the year
-
-Republican years are traditionally written in Roman numerals. The conversion function uses a lookup table of value-to-symbol pairs and repeatedly subtracts:
-
-```javascript
-function toRoman(n) {
-  var vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
-  var syms = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
-  var r = '';
-  for (var i = 0; i < vals.length; i++) {
-    while (n >= vals[i]) { r += syms[i]; n -= vals[i]; }
-  }
-  return r;
-}
-```
-
-Note the subtractive notation pairs: `CM` (900), `CD` (400), `XC` (90), `XL` (40), `IX` (9), `IV` (4). These are listed before their additive equivalents so the greedy subtraction hits them first.
-
-### 6.4 Rendering into the DOM
-
-```javascript
-var rep = toRep(new Date());
-if (rep) {
-  document.getElementById('rep-date-main').textContent = rep.comp
-    ? 'Jour comp. ' + rep.day + ' · An ' + toRoman(rep.year)
-    : rep.day + ' ' + MONTHS[rep.month - 1] + ' An ' + toRoman(rep.year);
-
-  document.getElementById('rep-date-day').textContent = rep.dayName;
-}
-```
-
-`new Date()` returns the current local date. `getMonth()` returns 0–11, so `+ 1` converts it to 1–12 for the `jdn()` function.
-
----
-
-## 7. The D3 flight animation
-
-D3 (Data-Driven Documents) is a JavaScript library for creating SVG graphics from data. Here it is used for one specific task: drawing and animating a curved flight path.
-
-### 7.1 Setting up the SVG
-
-The `#flight-svg` element fills the entire `.flight-panel` div. D3 selects it and gets its pixel dimensions:
+### 6.2 Setting up and clearing the SVG
 
 ```javascript
 function runFlight() {
@@ -585,12 +577,14 @@ function runFlight() {
   var H  = el.clientHeight || 400;
 
   var svg = d3.select(el);
-  svg.selectAll('*').remove();  // clear any previous render before re-running
+  svg.selectAll('*').remove();
 ```
 
-`svg.selectAll('*').remove()` is essential because `runFlight()` is called on every hover — without clearing, paths and markers would pile up on each re-trigger.
+`el.clientWidth` and `el.clientHeight` give the rendered pixel dimensions of the SVG element. The `|| 500` fallback handles the case where the panel is hidden and the browser returns 0.
 
-### 7.2 The background grid
+`svg.selectAll('*').remove()` clears everything drawn in previous runs. `runFlight()` is called on every hover of "moved". Without this line, each re-trigger would add new paths, markers, and labels on top of the previous ones.
+
+### 6.3 The background engineering grid
 
 ```javascript
 var grid = svg.append('g').attr('opacity', 0.06);
@@ -601,71 +595,82 @@ for (var x = 0; x < W; x += 40) {
     .attr('x2', x).attr('y2', H)
     .attr('stroke', '#0c0c0c').attr('stroke-width', 0.5);
 }
-// same for horizontal lines
 ```
 
-This creates an engineering-drawing / graph-paper texture. At 6% opacity it's barely perceptible but gives the panel depth.
+All grid lines are grouped in a `<g>` element with `opacity: 0.06`. Setting opacity on the group rather than on each line means a single attribute controls all of them—cleaner and more performant than setting opacity on every individual line.
 
-### 7.3 The flight path — quadratic Bézier curve
+At 6% opacity the grid is subliminal—you perceive depth and structure without consciously seeing a grid. This is a technique borrowed from engineering drawings and graph paper.
 
-A Bézier curve is defined by start, end, and one or more control points that pull the curve toward them without the curve passing through them.
+### 6.4 The Bézier curve flight path
 
 ```javascript
 var mx  = { x: W * 0.28, y: H * 0.68 };  // Mexico City
 var ny  = { x: W * 0.72, y: H * 0.28 };  // New York
 
-var cpx = (mx.x + ny.x) / 2;              // control point x: midpoint
-var cpy = Math.min(mx.y, ny.y) - H * 0.32; // control point y: above both cities
+var cpx = (mx.x + ny.x) / 2;
+var cpy = Math.min(mx.y, ny.y) - H * 0.32;
 
 var trail = svg.append('path')
-  .attr('d', 'M' + mx.x + ',' + mx.y +
-             ' Q' + cpx + ',' + cpy +
-             ' ' + ny.x + ',' + ny.y)
+  .attr('d', 'M' + mx.x + ',' + mx.y + ' Q' + cpx + ',' + cpy + ' ' + ny.x + ',' + ny.y)
 ```
 
-The SVG path command `M x,y` moves to a point. `Q cx,cy x,y` draws a quadratic Bézier from the current point to `x,y` with control point `cx,cy`.
+City positions are proportional to SVG dimensions so they scale correctly regardless of panel size.
 
-### 7.4 The stroke-dashoffset animation trick
+A **quadratic Bézier curve** is defined by three points: start, end, and one control point. The SVG path command `Q cx,cy x,y` draws a curve from the current position to `(x,y)` with control point `(cx,cy)`. The control point pulls the curve toward itself without the curve actually passing through it—like a magnet bending a wire.
 
-The path-drawing animation uses a CSS technique: set the stroke dash length equal to the total path length, then animate the offset from the full length down to zero. This reveals the path as if it were being drawn in real time.
+`cpy = Math.min(mx.y, ny.y) - H * 0.32` places the control point above both cities (lower y = higher on screen in SVG coordinates), creating the characteristic arc of a flight path.
+
+### 6.5 The stroke-dashoffset drawing animation
+
+This is a CSS trick applied via D3. Every SVG stroke can have a dash pattern: `stroke-dasharray: 500` creates one dash exactly 500px long. `stroke-dashoffset: 500` shifts that dash 500px backwards, making it invisible. Animating `stroke-dashoffset` from 500 to 0 slides the dash forward until it covers the path—which looks exactly like the path drawing itself in real time.
 
 ```javascript
 var pathLength = trail.node().getTotalLength();
 
 trail
-  .attr('stroke-dasharray',  pathLength)  // one dash exactly as long as the path
-  .attr('stroke-dashoffset', pathLength)  // offset = full length = invisible
+  .attr('stroke-dasharray',  pathLength)
+  .attr('stroke-dashoffset', pathLength)
   .transition()
     .duration(2200)
     .ease(d3.easeCubicInOut)
-    .attr('stroke-dashoffset', 0);        // animate offset to 0 = fully visible
+    .attr('stroke-dashoffset', 0);
 ```
 
-`getTotalLength()` is a native SVG DOM method that returns the arc length of any path element.
+`getTotalLength()` is a native SVG DOM method that returns the arc length of any `<path>` element. Using it ensures the dash length always exactly matches the path.
 
-`d3.easeCubicInOut` applies an easing function — the animation starts slow, accelerates through the middle, and decelerates at the end. This feels more physical than a linear animation.
+`d3.easeCubicInOut` applies cubic easing—the animation accelerates for the first third, runs at full speed in the middle, and decelerates for the last third. This matches the natural rhythm of real aircraft and feels more physical than a linear animation.
 
-### 7.5 Animating the plane
-
-The plane emoji travels along the path using `requestAnimationFrame`, D3's easing function, and `getPointAtLength()`:
+### 6.6 City markers with staggered reveal
 
 ```javascript
-var pathNode = trail.node();
-var startTime = null;
+cg.append('rect')
+  .attr('opacity', 0)
+  .transition()
+    .delay(i ? 2200 : 100)
+    .duration(200)
+    .attr('opacity', 1);
+```
 
+`i ? 2200 : 100` uses the ternary operator: Mexico City (index 0) appears after 100ms (almost immediately), New York (index 1) appears after 2200ms—exactly when the path animation completes and the plane arrives. Square markers are used rather than circles, consistent with the site's rectilinear geometric language.
+
+### 6.7 The `requestAnimationFrame` plane animation
+
+```javascript
 function animatePlane(timestamp) {
   if (!startTime) startTime = timestamp;
 
-  var progress = Math.min((timestamp - startTime) / 2200, 1);
-  var eased    = d3.easeCubicInOut(progress);  // 0→1 with ease
+  var elapsed  = timestamp - startTime;
+  var progress = Math.min(elapsed / 2200, 1);
+  var eased    = d3.easeCubicInOut(progress);
 
   var pt  = pathNode.getPointAtLength(eased * pathLength);
   var pt2 = pathNode.getPointAtLength(Math.min(eased * pathLength + 2, pathLength));
 
-  // heading angle: arctangent of the direction between pt and pt2
   var angle = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
 
-  plane.attr('transform', 'translate(' + pt.x + ',' + pt.y + ') rotate(' + angle + ')');
+  plane
+    .attr('transform', 'translate(' + pt.x + ',' + pt.y + ') rotate(' + angle + ')')
+    .attr('opacity', (progress > 0.02 && progress < 0.98) ? 1 : 0);
 
   if (progress < 1) {
     flightRaf = requestAnimationFrame(animatePlane);
@@ -673,23 +678,215 @@ function animatePlane(timestamp) {
     flightRaf = null;
   }
 }
-
-flightRaf = requestAnimationFrame(animatePlane);
 ```
 
-`getPointAtLength(n)` returns the `{x, y}` coordinate at distance `n` along the path. By sampling two points 2px apart (`pt` and `pt2`), we get the direction of travel and use `Math.atan2` to compute the heading angle, which is then applied as a CSS rotation.
+`requestAnimationFrame` calls `animatePlane` before each screen repaint. The `timestamp` argument is a high-precision millisecond value. Using timestamps rather than frame counts makes the animation framerate-independent—the plane completes in exactly 2200ms on any display refresh rate.
 
-`flightRaf` stores the current `requestAnimationFrame` handle so that `reset()` can call `cancelAnimationFrame(flightRaf)` when the user hovers away mid-animation. Without this, the plane would continue moving even after the panel is hidden.
+`getPointAtLength(n)` returns the SVG coordinate `{x, y}` at distance `n` along the path. Two points are sampled 2px apart to compute the heading angle: `Math.atan2(dy, dx)` computes the angle of the vector between them. Note the argument order is `(y, x)`—this is a standard trigonometry convention.
+
+The `opacity` toggle hides the plane at the very start and end (`progress < 0.02` or `progress > 0.98`), so it doesn't pop in abruptly at the origin or freeze visibly at the destination.
+
+`flightRaf` stores the `requestAnimationFrame` handle. When `reset()` calls `cancelAnimationFrame(flightRaf)`, the next scheduled frame is cancelled—the plane disappears mid-flight when the user hovers away.
+
+---
+
+## 7. The espresso extraction dial
+
+The espresso panel is the most complex single piece of the site—a fully interactive SVG instrument built without any library, rendered entirely by JavaScript on each panel activation.
+
+### 7.1 The data model
+
+The dial maps a `0–1` float to three extraction zones defined by SCA (Specialty Coffee Association) parameters:
+
+```javascript
+var ZONES = [
+  {
+    min: 0, max: 0.30,
+    label: 'UNDER-EXTRACTED',
+    lines: ['EXT%  < 18.0', 'ACIDITY  HIGH', 'BODY     THIN', 'FINISH   SHORT']
+  },
+  {
+    min: 0.30, max: 0.70,
+    label: 'OPTIMAL',
+    lines: ['EXT%  18–22', 'ACIDITY  BALANCED', 'BODY     FULL', 'FINISH   CLEAN']
+  },
+  {
+    min: 0.70, max: 1.00,
+    label: 'OVER-EXTRACTED',
+    lines: ['EXT%  > 22.0', 'ACIDITY  MUTED', 'BODY     DRYING', 'FINISH   BITTER']
+  }
+];
+```
+
+**EXT%** (extraction yield) is the percentage of the coffee's dry mass that has dissolved into the water. Under ~18% yields sour, thin espresso; 18–22% is the SCA optimal range; over ~22% yields bitter, drying espresso.
+
+**TDS** (total dissolved solids) measures the concentration of the final beverage. Espresso optimal range is 8–12%.
+
+### 7.2 SVG geometry—arc coordinates
+
+The dial arc spans 140° from 200° to 340° (measuring clockwise from 3 o'clock = 0°, which is standard SVG/trigonometry convention). This maps to roughly 8 o'clock → 4 o'clock, opening downward.
+
+```javascript
+var CX    = 160;   // viewBox centre x
+var CY    = 165;   // viewBox centre y—offset downward to give arc more room
+var R     = 110;   // arc radius
+var START = 200;   // arc start angle in degrees
+var END   = 340;   // arc end angle in degrees
+var SPAN  = END - START;  // 140° total
+
+function rad(deg) { return deg * Math.PI / 180; }
+
+function arcPt(deg) {
+  return {
+    x: CX + R * Math.cos(rad(deg)),
+    y: CY + R * Math.sin(rad(deg))
+  };
+}
+```
+
+**Converting polar to Cartesian:** A point at angle `θ` and radius `r` from a centre `(cx, cy)` has Cartesian coordinates `(cx + r·cos(θ), cy + r·sin(θ))`. This is fundamental trigonometry used throughout the dial code.
+
+**Why offset `CY` downward to 165?** The arc opens downward through the bottom of the SVG viewBox (200 units tall). Centering at 165 rather than 100 gives more visual space inside the arc for the needle and labels, and less wasted space above it.
+
+### 7.3 Building the arc with SVG path commands
+
+```javascript
+svgEl.appendChild(el('path', {
+  d: 'M ' + aStart.x + ' ' + aStart.y +
+     ' A ' + R + ' ' + R + ' 0 0 1 ' + aEnd.x + ' ' + aEnd.y,
+  stroke: '#d0cfc9',
+  'stroke-width': '2',
+  fill: 'none'
+}));
+```
+
+The SVG `A` (arc) command syntax is: `A rx ry x-rotation large-arc-flag sweep-flag x y`.
+
+- `rx ry`—x and y radii (equal for a circle)
+- `x-rotation`—rotation of the ellipse (0 for circles)
+- `large-arc-flag`—0 = draw the minor arc, 1 = draw the major arc
+- `sweep-flag`—0 = counter-clockwise, 1 = clockwise
+- `x y`—end point
+
+`large-arc-flag: 0` and `sweep-flag: 1` draws a clockwise minor arc from start to end. Since our arc spans 140° (less than 180°), it is the minor arc.
+
+**Why use `createElementNS` instead of `innerHTML`?** SVG elements must be created in the SVG namespace (`http://www.w3.org/2000/svg`). `document.createElement('path')` creates an HTML element that renders nothing. `document.createElementNS(NS, 'path')` creates a proper SVG element. The `el()` helper wraps this:
+
+```javascript
+var NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  var e = document.createElementNS(NS, tag);
+  Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+  return e;
+}
+```
+
+### 7.4 The needle and SVG transforms
+
+```javascript
+var needleGroup = document.createElementNS(NS, 'g');
+needleGroup.setAttribute('transform',
+  'rotate(' + posToAngle(pos) + ' ' + CX + ' ' + CY + ')');
+
+// Needle shaft—drawn horizontally, then rotated
+needleGroup.appendChild(el('line', {
+  x1: CX, y1: CY,
+  x2: CX + R - 12, y2: CY,
+  stroke: '#0c0c0c', 'stroke-width': '1.5'
+}));
+
+// Needle tip—small red square
+needleGroup.appendChild(el('rect', {
+  x: CX + R - 16, y: CY - 3,
+  width: '6', height: '6',
+  fill: '#cc3320'
+}));
+```
+
+The needle is drawn *horizontally*—pointing right along the x-axis from the centre. Then the whole group is rotated by the current angle using `transform="rotate(angle cx cy)"`.
+
+`rotate(angle cx cy)` rotates around a specific point `(cx, cy)` rather than the SVG origin. This is essential—rotating around the origin would move the needle off-screen. Rotating around the dial centre keeps it in place while changing its angle.
+
+When the user drags, only the `transform` attribute needs updating:
+
+```javascript
+needleGroup.setAttribute('transform',
+  'rotate(' + posToAngle(pos) + ' ' + CX + ' ' + CY + ')');
+```
+
+No geometry needs to be recalculated. The needle is always horizontal in its own coordinate system; the transform makes it point in the right direction.
+
+### 7.5 Drag interaction with Pointer Events
+
+```javascript
+svgEl.addEventListener('pointerdown', function (e) {
+  dragging = true;
+  svgEl.setPointerCapture(e.pointerId);
+});
+
+svgEl.addEventListener('pointermove', function (e) {
+  if (!dragging) return;
+  pos = eventToPos(e);
+  needleGroup.setAttribute('transform',
+    'rotate(' + posToAngle(pos) + ' ' + CX + ' ' + CY + ')');
+  updateDescriptors(pos);
+});
+```
+
+**Why Pointer Events instead of Mouse Events?** The Pointer Events API (`pointerdown`, `pointermove`, `pointerup`) unifies mouse, touch, and stylus input. A touch drag on mobile fires `pointermove` events exactly like a mouse drag on desktop—no separate touch event handling required.
+
+**`setPointerCapture`** is the key technique for drag interactions. Normally, dragging the mouse outside the SVG element stops it receiving `pointermove` events. `setPointerCapture(e.pointerId)` tells the browser to route all subsequent pointer events to this element even if the pointer leaves it. This makes the drag feel solid—the needle follows the cursor even when it briefly leaves the dial.
+
+### 7.6 Converting pointer position to dial angle
+
+```javascript
+function eventToPos(e) {
+  var rect   = svgEl.getBoundingClientRect();
+  var scaleX = 320 / rect.width;
+  var scaleY = 200 / rect.height;
+
+  var svgX = (e.clientX - rect.left) * scaleX;
+  var svgY = (e.clientY - rect.top)  * scaleY;
+
+  var angleDeg = Math.atan2(svgY - CY, svgX - CX) * 180 / Math.PI;
+  if (angleDeg < 0) angleDeg += 360;
+
+  var t = (angleDeg - START) / SPAN;
+  return Math.max(0, Math.min(1, t));
+}
+```
+
+The SVG `viewBox` is `"0 0 320 200"` but the rendered element may be any pixel size. `getBoundingClientRect()` gives the actual pixel size. Dividing `320 / rect.width` gives the scale factor to convert screen pixels to viewBox units.
+
+`Math.atan2(dy, dx)` returns an angle in `[−π, π]`. Adding 360 when the result is negative normalises it to `[0, 360)`.
+
+`(angleDeg - START) / SPAN` maps the angle range `[START, END]` to `[0, 1]`. `Math.max(0, Math.min(1, t))` clamps it so dragging outside the arc doesn't produce values below 0 or above 1.
+
+### 7.7 Live extraction percentage
+
+```javascript
+function updateDescriptors(t) {
+  var zone   = getZone(t);
+  var extPct = 16 + t * 10;  // maps 0→16%, 1→26%
+
+  zEl.textContent = zone.label + '  ·  EXT ' + extPct.toFixed(1) + '%';
+  nEl.textContent = zone.lines.join('\n');
+}
+```
+
+`16 + t * 10` linearly interpolates the dial's 0–1 range to a 16–26% extraction yield range. At `t = 0.48` (the default), `EXT = 20.8%`—well inside the optimal zone.
+
+`toFixed(1)` formats the number to one decimal place. Without it, floating-point arithmetic would produce values like `20.799999999998`.
+
+The readout lines use `'\n'` as a separator and `white-space: pre` in CSS to render as a stacked column—mimicking terminal output.
 
 ---
 
 ## 8. The glitch and net-art layer
 
-All glitch effects are in section 4 of `main.js` and section 9 of `style.css`. They are additive — removing them restores the clean Bauhaus site.
+All glitch effects live in section 4 of `main.js` and section 9 of `style.css`. They are fully additive—removing them restores the clean Bauhaus site.
 
 ### 8.1 CRT scan lines
-
-A faint repeating stripe pattern overlaid on the right panel using a CSS `::after` pseudo-element:
 
 ```css
 .right::after {
@@ -708,62 +905,57 @@ A faint repeating stripe pattern overlaid on the right panel using a CSS `::afte
 }
 ```
 
-`repeating-linear-gradient` tiles the pattern: 2px transparent, then 2px very-slightly-dark, repeat. At 1.8% opacity it's subliminal — you notice something without being able to say what.
+`repeating-linear-gradient` tiles its pattern infinitely. The pattern: 2px transparent, 2px very slightly dark (1.8% black), repeat. This produces horizontal stripes 4px tall, mimicking a CRT monitor's scan lines.
 
-`pointer-events: none` ensures the pseudo-element is invisible to mouse events — clicks and hovers pass straight through it.
+At 1.8% opacity the effect is subliminal—viewers perceive texture and a slight analog quality without being able to identify what they're seeing.
+
+`pointer-events: none` is essential—a `::after` pseudo-element covering the entire panel would otherwise intercept all mouse events, blocking interactions with the espresso dial, contact links, etc.
+
+`z-index: 100` places the scan lines above all panel content, so they overlay the text, photos, and SVG elements.
 
 ### 8.2 Chromatic aberration on the name heading
-
-Real chromatic aberration (colour fringing) occurs when a lens refracts different wavelengths of light differently. The CSS approximation uses `text-shadow` to create offset coloured ghost layers:
 
 ```css
 .name-heading:hover {
   text-shadow:
-    -2px 0 rgba(204, 51, 32, 0.65),  /* red ghost, shifted left  */
-     2px 0 rgba(0,  0, 145, 0.5);   /* blue ghost, shifted right */
+    -2px 0 rgba(204, 51, 32, 0.65),   /* red channel, shifted left  */
+     2px 0 rgba(0,   0, 145, 0.5);    /* blue channel, shifted right */
+  animation: glitch-name 2.4s infinite;
 }
-```
 
-The name has one shadow shifted 2px left in red and one shifted 2px right in blue. Combined with the actual black text in the middle, this simulates the three colour channels being slightly out of register.
-
-The `glitch-name` keyframe animates this sporadically:
-
-```css
 @keyframes glitch-name {
-  0%,  90%  { text-shadow: /* normal aberration */; }
-  91%        { text-shadow: /* exaggerated */; clip-path: inset(20% 0 60% 0); }
-  92%        { text-shadow: /* flipped */;      clip-path: inset(60% 0 10% 0); }
-  93%        { text-shadow: /* normal */;        clip-path: none; }
-  100%       { text-shadow: /* normal */; }
+  0%, 90%  { text-shadow: -2px 0 rgba(204,51,32,0.65), 2px 0 rgba(0,0,145,0.5); }
+  91%      { text-shadow: -4px 0 rgba(204,51,32,0.8),  3px 1px rgba(0,0,145,0.6);
+             clip-path: inset(20% 0 60% 0); }
+  92%      { text-shadow:  3px 0 rgba(204,51,32,0.8), -3px 0 rgba(0,0,145,0.6);
+             clip-path: inset(60% 0 10% 0); }
+  93%      { clip-path: none; }
+  100%     { text-shadow: -2px 0 rgba(204,51,32,0.65), 2px 0 rgba(0,0,145,0.5); }
 }
 ```
 
-`clip-path: inset(top right bottom left)` clips the element to a rectangle. At frame 91%, only the middle 20% of the text height is visible. At frame 92%, only a different slice. This creates a brief horizontal tearing effect — a classic CRT glitch artifact.
+Real chromatic aberration occurs when a lens refracts different wavelengths differently—red light bends slightly differently from blue light, causing colour fringing at high-contrast edges. `text-shadow` creates offset ghost copies of the text in red and blue, simulating this fringing.
 
-### 8.3 The glitchy panel bar
+For 90% of the hover animation the effect is stable. At the 91% mark it fires a rapid three-frame tearing sequence using `clip-path: inset()`. This command clips the element to a rectangle defined by insets from each edge. `inset(20% 0 60% 0)` shows only the horizontal band from 20% to 40% of the element's height—a thin slice that creates the horizontal tearing effect characteristic of a degraded video signal.
 
-The red bar that slides in on panel activation normally uses a smooth CSS `transition`. For the glitch version, we replace the transition with a keyframe animation that stutters:
+### 8.3 Glitchy panel bar
 
 ```css
-.panel.active .panel-bar {
-  animation: bar-glitch 0.45s cubic-bezier(0.22,1,0.36,1) both;
-}
-
 @keyframes bar-glitch {
   0%   { transform: scaleX(0);    opacity: 1; }
   30%  { transform: scaleX(0.55); opacity: 0.4; }
-  31%  { transform: scaleX(0.3);  opacity: 1; }   /* sudden jump back */
+  31%  { transform: scaleX(0.3);  opacity: 1; }
   55%  { transform: scaleX(0.8);  opacity: 0.6; }
-  56%  { transform: scaleX(0.65); opacity: 1; }   /* another stutter */
+  56%  { transform: scaleX(0.65); opacity: 1; }
   100% { transform: scaleX(1);    opacity: 1; }
 }
 ```
 
-The 30%→31% and 55%→56% jumps create the stutter — the bar briefly retreats before pushing forward again.
+`transform-origin: left` makes `scaleX` expand from the left edge.
 
-### 8.4 The panel wipe transition
+The 30%→31% and 55%→56% jumps are single-frame reversals. Because CSS animations interpolate between keyframes, the jump from `scaleX(0.55)` at 30% to `scaleX(0.3)` at 31% is instantaneous (1% of the animation duration = ~4.5ms). It reads as a mechanical stutter—the bar briefly retreats before pushing forward.
 
-Instead of a clean opacity fade, panels appear with a stepped clip-path wipe:
+### 8.4 Panel wipe transition
 
 ```css
 .panel.active {
@@ -771,19 +963,19 @@ Instead of a clean opacity fade, panels appear with a stepped clip-path wipe:
 }
 
 @keyframes panel-wipe {
-  0%   { opacity: 0; clip-path: inset(0 100% 0 0); } /* fully clipped */
+  0%   { opacity: 0; clip-path: inset(0 100% 0 0); }
   40%  { opacity: 1; clip-path: inset(0 60%  0 0); }
   70%  { opacity: 1; clip-path: inset(0 15%  0 0); }
-  85%  { opacity: 1; clip-path: inset(0 25%  0 0); } /* stutter back  */
-  100% { opacity: 1; clip-path: inset(0 0    0 0); } /* fully visible */
+  85%  { opacity: 1; clip-path: inset(0 25%  0 0); }
+  100% { opacity: 1; clip-path: inset(0 0    0 0); }
 }
 ```
 
-`steps(8, end)` makes the animation jump through 8 discrete states instead of interpolating smoothly — this is what creates the stepped/scanline quality. `clip-path: inset(0 X 0 0)` clips `X%` from the right, revealing the panel from left to right.
+`steps(8, end)` divides the animation into 8 equal discrete jumps rather than interpolating smoothly. The animation snaps between states rather than flowing—mimicking a CRT electron beam scanning across the screen one stripe at a time.
+
+`clip-path: inset(0 X 0 0)` clips `X%` from the right edge, revealing the panel from left to right. The 85% keyframe briefly steps back to `25%` (from `15%` at 70%)—a stutter that makes the wipe feel unstable.
 
 ### 8.5 Text scramble on hover
-
-When hovering a `.hl` word, its characters are briefly replaced with noise before resolving:
 
 ```javascript
 var GLITCH_CHARS = '!@#$%&?/\\|_-+~^`\'"<>.,:;';
@@ -794,12 +986,16 @@ function scrambleText(el, original, duration, steps) {
 
   var interval = setInterval(function () {
     frame++;
-    if (frame >= steps) { el.textContent = original; clearInterval(interval); return; }
+    if (frame >= steps) {
+      el.textContent = original;
+      clearInterval(interval);
+      return;
+    }
 
     var progress = frame / steps;
     var scrambled = original.split('').map(function (ch, i) {
-      if (ch === ' ' || ch === ',' || ch === '.') return ch;  // punctuation passes through
-      if (progress > (original.length - i) / original.length) return ch;  // resolved
+      if (ch === ' ' || ch === ',' || ch === '.') return ch;
+      if (progress > (original.length - i) / original.length) return ch;
       return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
     }).join('');
 
@@ -808,30 +1004,36 @@ function scrambleText(el, original, duration, steps) {
 }
 ```
 
-The resolution is right-to-left: `progress > (original.length - i) / original.length`. When `progress` is 0.5 (halfway through), the right half of the word has resolved and the left half is still noise. This feels more natural than resolving left-to-right, which reads like normal text appearing.
+`setInterval(fn, stepMs)` fires `fn` every `stepMs` milliseconds, producing a fixed number of frames at a fixed frame rate. `clearInterval` stops it when the scramble completes.
 
-Using keyboard characters (`!@#$%&?`) rather than block elements (`▓▒░█`) keeps the scramble subtle — the characters fit within the same typographic metrics as the original text, so the word doesn't jump in width.
+The resolution pattern `progress > (original.length - i) / original.length` resolves characters right-to-left. At 50% progress, the rightmost characters have resolved and the leftmost are still noise. This creates a rightward sweep of resolution that feels more natural than left-to-right (which looks like normal text appearing).
 
-### 8.6 Cursor trail
+**Why keyboard characters rather than block elements?** Block elements (`▓▒░█`) have widths that differ from alphabetic characters, causing the scrambled word to jump in width and push adjacent words out of position. Keyboard characters like `!@#$%` have similar widths to alphabetic characters and cause no layout shifts.
 
-A pool of 8 `<div>` elements is created and recycled:
+This function is reused across three contexts with different parameters:
+- `.hl` hover words: 150ms, 5 steps (fast, subtle)
+- `#left-index-label` corruption: 500ms, 7 steps (moderate)
+- `.motto-hex` corruption: 800ms, 10 steps (slow, languorous)
+
+### 8.6 Cursor trail pool
 
 ```javascript
-var TRAIL_SIZE = 8;
-var trailPool  = [];
+var TRAIL_SIZE  = 8;
+var TRAIL_DELAY = 30;
 
-for (var i = 0; i < TRAIL_SIZE; i++) {
+var trailPool = [];
+for (var ti = 0; ti < TRAIL_SIZE; ti++) {
   var dot = document.createElement('div');
   dot.className = 'cursor-trail';
   document.body.appendChild(dot);
   trailPool.push(dot);
 }
-```
 
-On each `mousemove` (throttled to 30ms intervals), the next dot in the pool is positioned at the cursor and its animation is re-triggered:
-
-```javascript
 document.addEventListener('mousemove', function (e) {
+  var now = Date.now();
+  if (now - lastTrailTime < TRAIL_DELAY) return;
+  lastTrailTime = now;
+
   var dot = trailPool[trailIndex % TRAIL_SIZE];
   trailIndex++;
 
@@ -839,50 +1041,64 @@ document.addEventListener('mousemove', function (e) {
   dot.style.top  = e.clientY + 'px';
 
   dot.classList.remove('visible');
-  void dot.offsetWidth;  // force reflow — without this, removing and re-adding
-                         // the class in the same frame has no effect
+  void dot.offsetWidth;
   dot.classList.add('visible');
 });
 ```
 
-`void dot.offsetWidth` forces the browser to perform a synchronous layout reflow, which flushes any pending style changes. Without it, removing and immediately re-adding `visible` in the same JavaScript task is a no-op — the browser batches the changes and never sees the class as removed.
+**Why a pool?** Creating and destroying a `<div>` on every `mousemove` event causes frequent garbage collection pauses. The pool pre-creates 8 elements and recycles them in a ring—`trailIndex % TRAIL_SIZE` wraps back to 0 after index 7. At any given moment, up to 8 dots exist in the DOM; older dots simply fade out and get repositioned when their slot comes up again.
 
-The CSS animation fades the dot out and scales it up slightly:
+**The `void dot.offsetWidth` trick:** CSS classes are batched by the browser. Removing `.visible` and immediately re-adding it in the same JavaScript task is a no-op—the browser would see only the final state. `void dot.offsetWidth` forces a synchronous layout reflow, flushing the pending class removal to the renderer before the class is added back. Without it, the fade animation would never restart.
 
-```css
-@keyframes trail-fade {
-  0%   { opacity: 0.7; transform: translate(-50%,-50%) scale(1); }
-  100% { opacity: 0;   transform: translate(-50%,-50%) scale(2); }
-}
-```
+`TRAIL_DELAY = 30` throttles dot creation to one per 30ms maximum. Without throttling, fast mouse movement would generate hundreds of events per second.
 
-`translate(-50%, -50%)` centres the dot on the cursor position (since `left`/`top` position the top-left corner).
-
-### 8.7 Periodic text corruption
-
-The Republican date and motto hex block corrupt themselves on a random schedule using the same `scrambleText` function:
+### 8.7 Periodic index label corruption
 
 ```javascript
-function corruptRepDate() {
-  scrambleText(repMainEl, repMainOriginal, 600, 8);
-  setTimeout(function () {
-    scrambleText(repDayEl, repDayOriginal, 420, 6);
-  }, 80);  // slight offset — the day name corrupts 80ms after the date
+var indexLabelEl = document.getElementById('left-index-label');
 
-  var nextDelay = 5000 + Math.random() * 4000;  // 5–9 seconds
-  setTimeout(corruptRepDate, nextDelay);
+if (indexLabelEl) {
+  var indexLabelOriginal = indexLabelEl.textContent;
+
+  function corruptIndexLabel() {
+    scrambleText(indexLabelEl, indexLabelOriginal, 500, 7);
+
+    var nextDelay = 5000 + Math.random() * 4000;
+    setTimeout(corruptIndexLabel, nextDelay);
+  }
+
+  setTimeout(corruptIndexLabel, 4000);
 }
-
-setTimeout(corruptRepDate, 4000);  // first corruption after 4 seconds
 ```
 
-`Math.random() * 4000` adds up to 4 seconds of jitter to the schedule, so the corruption feels organic rather than mechanical. The motto hex block uses a 7–15 second interval, offset from the date so they never corrupt simultaneously.
+The `01 / README.md` label in the top-left corrupts briefly every 5–9 seconds. `Math.random() * 4000` adds jitter so the corruption never feels mechanical—it's organic, like a transmission error on a bad connection.
+
+`corruptIndexLabel` calls itself after each corruption via `setTimeout`, creating a self-scheduling loop. This is cleaner than `setInterval` for variable-delay repetition: each invocation sets its own next delay, making the intervals genuinely random.
+
+`if (indexLabelEl)` guards against the function throwing if the element doesn't exist—defensive programming that costs nothing.
+
+### 8.8 Motto hex block corruption
+
+```javascript
+function corruptMotto() {
+  scrambleText(mottoEl, mottoOriginal, 800, 10);
+  setTimeout(corruptMotto, 8000 + Math.random() * 8000);
+}
+
+setTimeout(corruptMotto, 7000);
+```
+
+The motto hex block uses slower parameters: 800ms duration, 10 steps. The first corruption fires at 7 seconds—offset from the 4-second index label corruption so they never overlap.
+
+The motto is in a `<pre>` element. `el.textContent` returns all text including newlines, and setting `el.textContent = scrambled` preserves the element itself. Spaces and newlines pass through the scramble unchanged, so the ASCII box structure partially persists even mid-corruption.
 
 ---
 
-## 9. The motto — 諸行無常
+## 9. The motto—諸行無常
 
-The motto is encoded as UTF-8 hex bytes in the format matching the email signature:
+### 9.1 The encoding
+
+The motto is displayed as its raw UTF-8 hex bytes:
 
 ```
 ;;;;;;;;;;;;;;;;;;;;;;;
@@ -891,11 +1107,16 @@ The motto is encoded as UTF-8 hex bytes in the format matching the email signatu
 ;;;;;;;;;;;;;;;;;;;;;;;
 ```
 
-`E8 AB B8` are the three bytes of `諸` in UTF-8. `E8 A1 8C` are `行`. `E7 84 A1` are `無`. `E5 B8 B8` are `常`.
+`E8 AB B8` = `諸`. `E8 A1 8C` = `行`. `E7 84 A1` = `無`. `E5 B8 B8` = `常`.
 
-**Why is one Japanese character three bytes?** UTF-8 is a variable-length encoding. ASCII characters use 1 byte. Characters in the range U+0080–U+07FF use 2 bytes. Characters in the range U+0800–U+FFFF (which includes most CJK characters) use 3 bytes. Characters in the range U+10000–U+10FFFF use 4 bytes.
+**Why three bytes per character?** UTF-8 is a variable-length encoding. Code points U+0000–U+007F (ASCII) encode to 1 byte. U+0080–U+07FF encode to 2 bytes. U+0800–U+FFFF—which covers the entire CJK Unified Ideographs block—encode to 3 bytes. The four characters of 諸行無常 are all in the U+0800–U+FFFF range: 諸 = U+8AF8, 行 = U+884C, 無 = U+7121, 常 = U+5E38.
 
-The hex block is in a `<pre>` element inside the default panel:
+The 3-byte UTF-8 encoding follows the bit pattern `1110xxxx 10xxxxxx 10xxxxxx`. For 諸 (U+8AF8 = binary `1000 1010 1111 1000`):
+- First byte: `1110` + `1000` = `0xE8`
+- Second byte: `10` + `101011` = `0xAB`
+- Third byte: `10` + `111000` = `0xB8`
+
+### 9.2 The HTML and CSS
 
 ```html
 <div class="motto" id="motto">
@@ -907,13 +1128,20 @@ The hex block is in a `<pre>` element inside the default panel:
 </div>
 ```
 
-`<pre>` preserves whitespace and newlines, which is why the ASCII art box renders correctly. Without `<pre>`, the browser would collapse all whitespace into single spaces.
-
-The hover reveals the kanji:
+`<pre>` (preformatted text) preserves all whitespace literally—spaces, tabs, and newlines are rendered as-is. Without `<pre>`, the browser would collapse the newlines to single spaces and destroy the ASCII art box structure.
 
 ```css
-.motto { position: absolute; bottom: 3rem; left: 50%; transform: translateX(-50%); }
+.motto {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+```
 
+`left: 50%; transform: translateX(-50%)` is the canonical technique for horizontally centring an absolutely positioned element of unknown width. `left: 50%` positions the element's left edge at the horizontal centre. `translateX(-50%)` shifts it left by half its own width. The result: the element's centre is at the container's centre. This works for any element width.
+
+```css
 .motto-hex  { color: var(--rule); transition: color 0.2s; }
 .motto:hover .motto-hex { color: var(--mid); }
 
@@ -928,13 +1156,13 @@ The hover reveals the kanji:
 }
 ```
 
-`left: 50%; transform: translateX(-50%)` is the standard technique for horizontally centring an absolutely positioned element of unknown width: position the left edge at the halfway point, then shift left by half the element's own width.
+At rest, the hex is rendered in `--rule`—barely visible. Hovering brightens it and reveals the kanji.
+
+The kanji reveal uses two simultaneous transitions: `opacity` (fade in) and `transform` from `translateY(5px)` to `translateY(0)` (slides up 5px). Using `transform` for the vertical movement instead of `top` or `margin-top` is important for performance: `transform` is composited on the GPU and doesn't trigger layout recalculation.
 
 ---
 
 ## 10. Entrance animations
-
-Elements fade in on page load with staggered delays:
 
 ```css
 @keyframes fadeIn {
@@ -942,34 +1170,38 @@ Elements fade in on page load with staggered delays:
   to   { opacity: 1; }
 }
 
-.name-heading    { animation: fadeIn 0.5s 0.00s ease both; }
-.bio             { animation: fadeIn 0.5s 0.05s ease both; }
-.left-index      { animation: fadeIn 0.5s 0.00s ease both; }
-.left-footer     { animation: fadeIn 0.5s 0.10s ease both; }
-#republican-date { animation: fadeIn 0.5s 0.15s ease both; }
+.name-heading { animation: fadeIn 0.5s 0.00s ease both; }
+.bio          { animation: fadeIn 0.5s 0.05s ease both; }
+.left-index   { animation: fadeIn 0.5s 0.00s ease both; }
+.left-footer  { animation: fadeIn 0.5s 0.10s ease both; }
 ```
 
-The shorthand `animation: fadeIn 0.5s 0.05s ease both` means:
-- `fadeIn` — the keyframe name
-- `0.5s` — duration
-- `0.05s` — delay before starting
-- `ease` — easing function
-- `both` — `animation-fill-mode: both`, which means the element starts at `opacity: 0` (the `from` state) before the delay fires, and stays at `opacity: 1` (the `to` state) after finishing
+The `animation` shorthand expands to:
+- `fadeIn`—`animation-name`
+- `0.5s`—`animation-duration`
+- `0.00s`—`animation-delay`
+- `ease`—`animation-timing-function`
+- `both`—`animation-fill-mode`
 
-Without `both`, elements would be visible at full opacity during the delay, flash to invisible when the animation starts, and then fade in. `both` prevents this.
+**`animation-fill-mode: both`** is the critical value. It means: before the animation starts (during the delay), apply the `from` state (`opacity: 0`); after the animation ends, retain the `to` state (`opacity: 1`). Without `both`:
+- During the delay, elements would be visible at full opacity (their default state)
+- When the animation starts, they'd snap to invisible
+- Then fade back in
+
+This would produce a flash. `both` prevents it—elements start invisible and stay visible after fading in.
+
+The staggered delays (0s, 0.05s, 0.1s) create a cascading reveal rather than everything appearing simultaneously. The index strip and name appear together, then the bio, then the footer.
 
 ---
 
 ## 11. Deployment to GitHub Pages
 
-GitHub Pages serves static files directly from a repository. No server required.
+GitHub Pages serves static files from a repository with zero configuration. No server, no build step, no hosting cost.
 
-**Steps:**
+**Setup:**
+1. Create a repository named `yourusername.github.io`. This special name activates root-domain serving—the site will be live at `https://yourusername.github.io`.
 
-1. Create a repository on GitHub named `yourusername.github.io` (this makes it your root domain). Or any other name for a project page (`yourusername.github.io/site-name`).
-
-2. Push the three files and assets folder:
-
+2. Push the files:
 ```bash
 git init
 git add index.html style.css main.js assets/
@@ -978,46 +1210,39 @@ git remote add origin https://github.com/yourusername/yourusername.github.io.git
 git push -u origin main
 ```
 
-3. In the repository settings, go to **Pages** and set the source to the `main` branch, root directory.
+3. In repository Settings → Pages, confirm the source is set to the `main` branch, root directory. The site appears within 1–2 minutes.
 
-4. The site will be live at `https://yourusername.github.io` within a minute or two.
+**Updating the site** is a single command:
+```bash
+git add -A && git commit -m "Update" && git push
+```
 
-**Custom domain:** In Pages settings, add your domain. Create a `CNAME` file in the repo containing just your domain name. Point your DNS `A` records to GitHub's IP addresses (listed in their docs). HTTPS is provisioned automatically via Let's Encrypt.
+**Custom domain:** Add your domain in Settings → Pages, create a `CNAME` file in the repo root containing just the domain (e.g., `yourdomain.com`), and update your DNS to point to GitHub's servers. HTTPS is provisioned automatically via Let's Encrypt.
+
+**The `data-cfasync="false"` attribute** on the script tag becomes relevant here—if your custom domain sits behind Cloudflare's CDN proxy (very common), without this attribute Cloudflare injects an email-obfuscation script that blocks `main.js` execution.
 
 ---
 
 ## 12. Swapping in real assets
 
-All three asset placeholders follow the same pattern: a hatched placeholder div with a text label. To replace each one:
+Both asset placeholders are clearly marked in the HTML with comments.
 
 **Portrait photo (`assets/portrait.jpg`):**
-In `#panel-default`, find `.default-photo-main` and replace its contents:
+Already wired up—just drop `portrait.jpg` into the `assets/` folder:
 ```html
-<!-- Remove this: -->
-<div class="default-photo-fill"><span>assets/portrait.jpg</span></div>
-
-<!-- Add this: -->
 <img src="assets/portrait.jpg" alt="Sebastián" class="default-photo-img" />
 ```
 
 **Mexico City photo (`assets/cdmx.jpg`):**
-In `#panel-mexico`, find `.photo-border-main` and replace its contents:
+Same—`<img>` is already in the markup:
 ```html
-<img src="assets/cdmx.jpg" alt="Sebastián as a child in Mexico City" class="photo-img" />
+<img src="assets/cdmx.jpg" alt="..." class="photo-img" />
 ```
 
-**Kyūdō gif (`assets/kyudo.gif`):**
-In `#panel-kyudo`, find `.kyudo-placeholder` and replace its contents:
-```html
-<!-- For a gif: -->
-<img src="assets/kyudo.gif" alt="Kyūdō practice" class="kyudo-media" />
+**Updating the espresso "current bag"** when you change coffees: find the `.espresso-bag-grid` in `#panel-espresso` and update the six `.espresso-bag-val` spans. The HTML comment above the block links to the source URL for the current bag.
 
-<!-- For a video (note: autoplay requires muted in most browsers): -->
-<video src="assets/kyudo.mp4" autoplay loop muted playsinline class="kyudo-media"></video>
-```
-
-The CSS classes `.default-photo-img`, `.photo-img`, and `.kyudo-media` are already defined in `style.css` with `width: 100%; height: 100%; object-fit: cover; display: block` — they fill their container and crop to fit without distortion.
+**Updating espresso parameters** (dose, yield, time, temp): find `.espresso-params` in `#panel-espresso` and update the `.espresso-param-value` spans. These are your current dial-in numbers—they'll change every time you change beans or adjust your setup.
 
 ---
 
-*That's everything. The site is ~2,400 lines of hand-written HTML, CSS, and JavaScript — no build tools, no dependencies beyond D3 and Google Fonts, deployable with a single `git push`.*
+*The site is approximately 1,900 lines of hand-written HTML, CSS, and JavaScript—no build tools, no dependencies beyond D3 and Google Fonts, deployable with a single `git push`.*
