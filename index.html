@@ -95,7 +95,7 @@
         3. Interests: languages, music, espresso
         4. Contact: GitHub, LinkedIn, email
     -->
-    <p class="bio">
+    <p class="bio" id="bio-1">
       I am a Brooklyn-based computer science
       <span class="hl" data-panel="professor">professor</span>
       and <span class="hl" data-panel="developer">programmer</span>.
@@ -104,7 +104,7 @@
       where I studied at <span class="hl" data-panel="nyu">NYU</span>.
     </p>
 
-    <p class="bio">
+    <p class="bio" id="bio-2">
       Although I mostly deal in the
       <a class="bio-link" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material" target="_blank">introductory</a>
       and <a class="bio-link" href="https://github.com/sebastianromerocruz/CS3113-Intro-To-Game-Programming?tab=readme-ov-file#cs-uy-3113-introduction-to-game-programming" target="_blank">video game programming</a>
@@ -113,7 +113,7 @@
       <a class="bio-link" href="https://github.com/sebastianromerocruz/sonic-pi-lecture?tab=readme-ov-file#music-with-programming" target="_blank">science</a>.
     </p>
 
-    <p class="bio">
+    <p class="bio" id="bio-3">
       Outside of work, some of my interests involve
       <span class="hl" data-panel="lang-ja">learning</span>
       <span class="hl" data-panel="lang-cs">foreign</span>
@@ -122,7 +122,7 @@
       and obsessing over <span class="hl" data-panel="espresso">espresso</span>.
     </p>
 
-    <p class="bio">
+    <p class="bio" id="bio-4">
       Students can schedule office hours with me
       <a class="bio-link" href="https://calendly.com/profromerocruz/office-hours" target="_blank">here.</a>
       You can find me on <span class="hl" data-panel="contact">GitHub</span>
@@ -137,6 +137,18 @@
       <a href="https://linkedin.com/in/sebastian-romerocruz">LinkedIn</a>
       <a href="mailto:s.romerocruz@proton.me">Email</a>
     </div>
+
+    <!--
+      Language toggle — switches the entire bio between English and Spanish.
+      Spanish is the native language; this is not a translation panel but the
+      actual voice of the site. Sits at the bottom-right of the left column.
+      JS in main.js (section 6) handles the swap with the scramble effect.
+    -->
+    <button class="lang-toggle" id="lang-toggle" aria-label="Switch bio language">
+      <span class="lang-toggle-native">ES</span>
+      <span class="lang-toggle-sep">/</span>
+      <span class="lang-toggle-other" id="lang-toggle-other">EN</span>
+    </button>
 
 
   </div><!-- /.left -->

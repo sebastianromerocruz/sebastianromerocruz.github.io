@@ -212,7 +212,61 @@ body {
 }
 
 
-/* 4e. Footer links
+/* 4e. Language toggle
+   ─────────────────────────────────────────────────────────────────────────
+   Small EN / ES switcher at the bottom-right of the left column.
+   Active language is black; inactive is mid-grey. No border, no background
+   — reads as a label, not a button.                                        */
+
+.lang-toggle {
+  position: absolute;
+  bottom: 2.5rem;
+  right: 4rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-family: var(--mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* ES★ — star marks it as native; colour tracks active state like EN does */
+.lang-toggle-native {
+  color: var(--mid);       /* grey when EN is active (ES not currently reading) */
+  transition: color 0.15s;
+}
+
+.lang-toggle-native.active {
+  color: var(--black);     /* black when reading Spanish */
+}
+
+.lang-toggle-sep {
+  color: var(--rule);
+}
+
+/* EN — black when active, mid-grey when reading Spanish */
+.lang-toggle-other {
+  color: var(--black);
+  transition: color 0.15s;
+}
+
+.lang-toggle-other.dimmed {
+  color: var(--mid);
+}
+
+.lang-toggle:hover .lang-toggle-native,
+.lang-toggle:hover .lang-toggle-other {
+  color: var(--red);
+}
+
+
+/* 4f. Footer links
    ─────────────────────────────────────────────────────────────────────────
    GitHub · LinkedIn · Email — bottom-left, mono caps                      */
 

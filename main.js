@@ -690,4 +690,151 @@ if (indexLabelEl) {
     svgEl.addEventListener('pointercancel', function () { dragging = false; });
   }
 
+
+  /* =========================================================================
+     6. Spanish bio toggle
+     =========================================================================
+     Clicking the EN / ES button in the bottom-right of the left column
+     swaps all four bio paragraphs between English and Spanish in place,
+     using the scrambleText effect on each paragraph with a staggered delay.
+
+     Spanish is the native language — not a translation panel, but the
+     actual voice. The .hl spans and .bio-link anchors are preserved in both
+     versions, keeping the panel-switching system fully functional.
+     ========================================================================= */
+
+  /**
+   * Bio content for both languages.
+   * Each entry is an array of HTML strings, one per paragraph (#bio-1 … #bio-4).
+   * The .hl spans carry data-panel attributes so hover interactions continue
+   * to work after the swap. Links preserve their real hrefs.
+   */
+  var BIO_EN = [
+    'I am a Brooklyn-based computer science <span class="hl" data-panel="professor">professor</span> and <span class="hl" data-panel="developer">programmer</span>. I was born in <span class="hl" data-panel="mexico">Mexico City</span>, and later <span class="hl" data-panel="moved">moved</span> to New York, where I studied at <span class="hl" data-panel="nyu">NYU</span>.',
+    'Although I mostly deal in the <a class="bio-link" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material" target="_blank">introductory</a> and <a class="bio-link" href="https://github.com/sebastianromerocruz/CS3113-Intro-To-Game-Programming?tab=readme-ov-file#cs-uy-3113-introduction-to-game-programming" target="_blank">video game programming</a> pedagogy space, I also have experience in other areas of <a class="bio-link" href="https://github.com/sebastianromerocruz/game-programming-in-assembly?tab=readme-ov-file#october-13th-2022" target="_blank">computer</a> <a class="bio-link" href="https://github.com/sebastianromerocruz/sonic-pi-lecture?tab=readme-ov-file#music-with-programming" target="_blank">science</a>.',
+    'Outside of work, some of my interests involve <span class="hl" data-panel="lang-ja">learning</span> <span class="hl" data-panel="lang-cs">foreign</span> <span class="hl" data-panel="lang-la">languages</span>, <span class="hl" data-panel="music">music</span>, and obsessing over <span class="hl" data-panel="espresso">espresso</span>.',
+    'Students can schedule office hours with me <a class="bio-link" href="https://calendly.com/profromerocruz/office-hours" target="_blank">here.</a> You can find me on <span class="hl" data-panel="contact">GitHub</span> if you would like to check out my work, on <span class="hl" data-panel="contact">LinkedIn</span>, or via <span class="hl" data-panel="contact">e-mail</span>.'
+  ];
+
+  var BIO_ES = [
+    'Soy <span class="hl" data-panel="professor">profesor</span> y <span class="hl" data-panel="developer">programador</span> de ciencias de la computación en Brooklyn. Nací en la <span class="hl" data-panel="mexico">Ciudad de México</span> y después me <span class="hl" data-panel="moved">mudé</span> a Nueva York, donde estudié en <span class="hl" data-panel="nyu">NYU</span>.',
+    'Aunque me dedico principalmente a la pedagogía de programación <a class="bio-link" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material" target="_blank">introductoria</a> y de <a class="bio-link" href="https://github.com/sebastianromerocruz/CS3113-Intro-To-Game-Programming?tab=readme-ov-file#cs-uy-3113-introduction-to-game-programming" target="_blank">videojuegos</a>, también tengo experiencia en otras áreas de las <a class="bio-link" href="https://github.com/sebastianromerocruz/game-programming-in-assembly?tab=readme-ov-file#october-13th-2022" target="_blank">ciencias</a> <a class="bio-link" href="https://github.com/sebastianromerocruz/sonic-pi-lecture?tab=readme-ov-file#music-with-programming" target="_blank">computacionales</a>.',
+    'Fuera del trabajo, me gusta <span class="hl" data-panel="lang-ja">aprender</span> <span class="hl" data-panel="lang-cs">idiomas</span> <span class="hl" data-panel="lang-la">extranjeros</span>, la <span class="hl" data-panel="music">música</span> y el <span class="hl" data-panel="espresso">espresso</span>.',
+    'Mis estudiantes pueden programar horas de oficina <a class="bio-link" href="https://calendly.com/profromerocruz/office-hours" target="_blank">aquí.</a> Pueden encontrarme en <span class="hl" data-panel="contact">GitHub</span> para ver mi trabajo, en <span class="hl" data-panel="contact">LinkedIn</span>, o por <span class="hl" data-panel="contact">correo</span>.'
+  ];
+
+  /** IDs of the four bio paragraph elements */
+  var BIO_IDS = ['bio-1', 'bio-2', 'bio-3', 'bio-4'];
+
+  /** Current language state */
+  var bioLang = 'en';
+
+  var toggleBtn        = document.getElementById('lang-toggle');
+  var toggleOther  = toggleBtn ? toggleBtn.querySelector('.lang-toggle-other')  : null;
+  var toggleNative = toggleBtn ? toggleBtn.querySelector('.lang-toggle-native') : null;
+
+  /**
+   * Swap one bio paragraph's inner HTML with a scramble effect on the
+   * plain-text content, then swap the markup cleanly on the final frame.
+   *
+   * The scramble runs on the paragraph's current textContent (no HTML tags)
+   * so it reads as text noise, not angle-bracket soup. The actual innerHTML
+   * swap (which restores .hl spans and links) happens at the end.
+   *
+   * @param {HTMLElement} el       - The paragraph element
+   * @param {string}      newHTML  - The HTML string to swap in
+   * @param {number}      delay    - Milliseconds before scramble starts
+   */
+  function swapBio(el, newHTML, delay) {
+    var originalText = el.textContent;
+    var duration     = 320;
+    var steps        = 8;
+    var stepMs       = duration / steps;
+    var frame        = 0;
+
+    setTimeout(function () {
+      var interval = setInterval(function () {
+        frame++;
+
+        if (frame >= steps) {
+          /* Final frame: inject the real HTML with interactive spans */
+          el.innerHTML = newHTML;
+          clearInterval(interval);
+          /* Re-bind hover events to any new .hl elements inside this paragraph */
+          bindHlEvents(el.querySelectorAll('.hl'));
+          return;
+        }
+
+        var progress  = frame / steps;
+        var scrambled = originalText.split('').map(function (ch, i) {
+          if (ch === ' ' || ch === ',' || ch === '.') return ch;
+          if (progress > (originalText.length - i) / originalText.length) return ch;
+          return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+        }).join('');
+
+        el.textContent = scrambled;
+      }, stepMs);
+    }, delay);
+  }
+
+  /**
+   * Bind mouseenter / mouseleave panel-switching events to a NodeList of
+   * .hl elements. Called after innerHTML is swapped to re-wire new spans.
+   *
+   * @param {NodeList} newHls
+   */
+  function bindHlEvents(newHls) {
+    newHls.forEach(function (hl) {
+      var originalText = hl.textContent;
+
+      hl.addEventListener('mouseenter', function () {
+        hls.forEach(function (h) { h.classList.remove('active'); });
+        /* Also clear any freshly-bound elements */
+        document.querySelectorAll('.hl').forEach(function (h) { h.classList.remove('active'); });
+        hl.classList.add('active');
+        showPanel(hl.dataset.panel);
+        scrambleText(hl, originalText, 150, 5);
+      });
+
+      hl.addEventListener('mouseleave', function (e) {
+        var next = e.relatedTarget;
+        if (!next || !next.classList || !next.classList.contains('hl')) {
+          reset();
+        }
+        hl.textContent = originalText;
+      });
+    });
+  }
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function () {
+      var targetLang = (bioLang === 'en') ? 'es' : 'en';
+      var targetBio  = (targetLang === 'es') ? BIO_ES : BIO_EN;
+
+      /* Update bioLang and toggle appearance immediately on click */
+      bioLang = targetLang;
+      if (toggleOther) {
+        if (targetLang === 'es') {
+          toggleOther.classList.add('dimmed');
+        } else {
+          toggleOther.classList.remove('dimmed');
+        }
+      }
+      if (toggleNative) {
+        if (targetLang === 'es') {
+          toggleNative.classList.add('active');
+        } else {
+          toggleNative.classList.remove('active');
+        }
+      }
+
+      /* Stagger the four paragraphs: 0ms, 80ms, 160ms, 240ms */
+      BIO_IDS.forEach(function (id, i) {
+        var el = document.getElementById(id);
+        if (el) { swapBio(el, targetBio[i], i * 80); }
+      });
+    });
+  }
+
+
 })();
