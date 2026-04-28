@@ -55,9 +55,8 @@
     var target = document.getElementById('panel-' + id);
     if (target) {
       target.classList.add('active');
-      if (id === 'moved') {
-        runFlight();
-      }
+      if (id === 'moved')     { runFlight(); }
+      if (id === 'espresso')  { initDial();  }
     }
   }
 
@@ -690,13 +689,5 @@ if (indexLabelEl) {
     svgEl.addEventListener('pointerup',     function () { dragging = false; });
     svgEl.addEventListener('pointercancel', function () { dragging = false; });
   }
-
-  /* Hook initDial into the panel switching — run whenever espresso panel activates */
-  var _origShowPanel = showPanel;
-  showPanel = function (id) {
-    _origShowPanel(id);
-    if (id === 'espresso') { initDial(); }
-  };
-
 
 })();
