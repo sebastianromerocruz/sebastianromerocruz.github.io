@@ -22,6 +22,12 @@
     panel-default   — portrait photo; shown when nothing is hovered
     panel-professor — courses taught
     panel-developer — programming language proficiency (chip treatment)
+    panel-assembly  — 6502 disassembler terminal, triggered by the
+                      "computer" link (bio-2), not an .hl word
+    panel-science   — Sonic Pi live-coding terminal, triggered by the
+                      "science" link (bio-2), not an .hl word
+    panel-python    — two-pointer string-reversal trace (Python), triggered
+                      by the "introductory" link (bio-2), not an .hl word
     panel-mexico    — childhood photo from Mexico City
     panel-moved     — D3 animated flight path CDMX to NYC
     panel-nyu       — degrees from NYU Tandon
@@ -106,11 +112,11 @@
 
     <p class="bio" id="bio-2">
       Although I mostly deal in the
-      <a class="bio-link" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material" target="_blank">introductory</a>
+      <a class="bio-link" data-panel="python" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material" target="_blank">introductory</a>
       and <a class="bio-link" href="https://github.com/sebastianromerocruz/CS3113-Intro-To-Game-Programming?tab=readme-ov-file#cs-uy-3113-introduction-to-game-programming" target="_blank">video game programming</a>
       pedagogy space, I also have experience in other areas of
-      <a class="bio-link" href="https://github.com/sebastianromerocruz/game-programming-in-assembly?tab=readme-ov-file#october-13th-2022" target="_blank">computer</a>
-      <a class="bio-link" href="https://github.com/sebastianromerocruz/sonic-pi-lecture?tab=readme-ov-file#music-with-programming" target="_blank">science</a>.
+      <a class="bio-link" data-panel="assembly" href="https://github.com/sebastianromerocruz/game-programming-in-assembly?tab=readme-ov-file#october-13th-2022" target="_blank">computer</a>
+      <a class="bio-link" data-panel="science" href="https://github.com/sebastianromerocruz/sonic-pi-lecture?tab=readme-ov-file#music-with-programming" target="_blank">science</a>.
     </p>
 
     <p class="bio" id="bio-3">
@@ -291,16 +297,125 @@
             <span class="chip chip-outline">C++</span>
             <span class="chip chip-outline">C</span>
             <span class="chip chip-outline">C#</span>
+            <span class="chip chip-outline">6502</span>
           </div>
         </div>
         <div class="chip-row">
           <span class="chip-row-label">Exploring</span>
           <div class="chip-items">
-            <span class="chip chip-ghost">Haskell</span>
+            <span class="chip chip-ghost">SM83</span>
           </div>
         </div>
       </div>
     </div><!-- /#panel-developer -->
+
+
+    <!-- ==================================================================
+         ASSEMBLY PANEL — 6502 disassembler terminal
+         Triggered by hovering "computer" in bio-2 (a real <a> link to a
+         GitHub repo, styled as .bio-link, not an .hl word — see the
+         dedicated binding in main.js section 2b). Shares the .code-terminal
+         scaffolding (style.css 7b2) with the SCIENCE panel just below.
+
+         Static disassembly listing of a small NES sprite-DMA routine.
+         main.js periodically flags a random .code-line as .glitch while
+         this panel is active, which drives the CSS corruption animation.
+         ================================================================== -->
+    <div class="panel code-panel" id="panel-assembly">
+      <div class="panel-bar"></div>
+      <div class="panel-index">04a / Assembly</div>
+      <h2 class="panel-title">6502</h2>
+
+      <div class="code-terminal">
+        <div class="code-terminal-header">
+          <span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span>
+          <span class="code-terminal-title">disasm &mdash; sprite_dma.s</span>
+        </div>
+        <pre class="code-listing" id="asm-listing">
+<span class="code-line"><span class="code-accent">$8000</span> <span class="code-dim">A9 00</span>    <span class="code-bright">LDA</span> <span class="code-value">#$00</span>     <span class="code-comment">; A = 0</span></span>
+<span class="code-line"><span class="code-accent">$8002</span> <span class="code-dim">8D 00 20</span> <span class="code-bright">STA</span> <span class="code-value">$2000</span>    <span class="code-comment">; PPUCTRL</span></span>
+<span class="code-line"><span class="code-accent">$8005</span> <span class="code-dim">A2 10</span>    <span class="code-bright">LDX</span> <span class="code-value">#$10</span>     <span class="code-comment">; 16 sprites</span></span>
+<span class="code-line"><span class="code-accent">$8007</span> <span class="code-dim">BD 00 03</span> <span class="code-bright">LDA</span> <span class="code-value">$0300,X</span>  <span class="code-comment">; read OAM</span></span>
+<span class="code-line"><span class="code-accent">$800A</span> <span class="code-dim">9D 00 02</span> <span class="code-bright">STA</span> <span class="code-value">$0200,X</span>  <span class="code-comment">; shadow OAM</span></span>
+<span class="code-line"><span class="code-accent">$800D</span> <span class="code-dim">CA</span>       <span class="code-bright">DEX</span>              <span class="code-comment">; X--</span></span>
+<span class="code-line"><span class="code-accent">$800E</span> <span class="code-dim">D0 F7</span>    <span class="code-bright">BNE</span> <span class="code-value">$8007</span>    <span class="code-comment">; loop</span></span>
+<span class="code-line"><span class="code-accent">$8010</span> <span class="code-dim">A9 3F</span>    <span class="code-bright">LDA</span> <span class="code-value">#$3F</span>     <span class="code-comment">; palette hi</span></span>
+<span class="code-line"><span class="code-accent">$8012</span> <span class="code-dim">8D 06 20</span> <span class="code-bright">STA</span> <span class="code-value">$2006</span>    <span class="code-comment">; PPUADDR</span></span>
+<span class="code-line"><span class="code-accent">$8015</span> <span class="code-dim">60</span>       <span class="code-bright">RTS</span>              <span class="code-comment">; return</span></span></pre>
+        <div class="code-cursor" aria-hidden="true"></div>
+      </div>
+    </div><!-- /#panel-assembly -->
+
+
+    <!-- ==================================================================
+         SCIENCE PANEL — Sonic Pi live-coding console
+         Triggered by hovering "science" in bio-2 (a real <a> link to the
+         sonic-pi-lecture repo). Same .code-terminal scaffolding as the
+         ASSEMBLY panel above, just with a Ruby/Sonic Pi snippet instead
+         of a 6502 listing — reads as "same machine, different language."
+         ================================================================== -->
+    <div class="panel code-panel" id="panel-science">
+      <div class="panel-bar"></div>
+      <div class="panel-index">04b / Music-code</div>
+      <h2 class="panel-title">Sonic Pi</h2>
+
+      <div class="code-terminal">
+        <div class="code-terminal-header">
+          <span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span>
+          <span class="code-terminal-title">sonic_pi &mdash; beat.rb</span>
+        </div>
+        <pre class="code-listing" id="science-listing">
+<span class="code-line"><span class="code-accent">use_bpm</span> <span class="code-value">120</span></span>
+<span class="code-line"><span class="code-accent">live_loop</span> <span class="code-value">:groove</span> <span class="code-accent">do</span></span>
+<span class="code-line">  <span class="code-bright">sample</span> <span class="code-value">:bd_haus</span>, <span class="code-dim">amp:</span> <span class="code-value">1.2</span></span>
+<span class="code-line">  <span class="code-bright">sleep</span> <span class="code-value">0.5</span></span>
+<span class="code-line">  <span class="code-bright">sample</span> <span class="code-value">:drum_snare_hard</span></span>
+<span class="code-line">  <span class="code-bright">sleep</span> <span class="code-value">0.5</span></span>
+<span class="code-line">  <span class="code-accent">with_fx</span> <span class="code-value">:reverb</span>, <span class="code-dim">mix:</span> <span class="code-value">0.4</span> <span class="code-accent">do</span></span>
+<span class="code-line">    <span class="code-bright">synth</span> <span class="code-value">:pluck</span>, <span class="code-dim">note:</span> <span class="code-value">:e4</span></span>
+<span class="code-line">  <span class="code-accent">end</span></span>
+<span class="code-line"><span class="code-accent">end</span> <span class="code-comment">; loops forever</span></span></pre>
+        <div class="code-cursor" aria-hidden="true"></div>
+      </div>
+    </div><!-- /#panel-science -->
+
+
+    <!-- ==================================================================
+         PYTHON PANEL — Two-pointer string-reversal trace
+         Triggered by hovering "introductory" in bio-2 (a real <a> link to
+         the CS1134 repo). Same .code-terminal scaffolding as ASSEMBLY and
+         SCIENCE, but instead of a static listing + idle glitch, main.js
+         (section 4f) actually steps the algorithm on "yaw s'nnaws" —
+         highlighting the active source line and animating the L/R
+         pointers walking inward over the character trace below the code,
+         looping once it reaches the fully-reversed string.
+         ================================================================== -->
+    <div class="panel code-panel" id="panel-python">
+      <div class="panel-bar"></div>
+      <div class="panel-index">04c / Two-pointer</div>
+      <h2 class="panel-title">Python</h2>
+
+      <div class="code-terminal">
+        <div class="code-terminal-header">
+          <span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span>
+          <span class="code-terminal-title">two_pointer.py</span>
+        </div>
+        <pre class="code-listing" id="python-listing">
+<span class="code-line"><span class="code-accent">def</span> <span class="code-bright">reverse_string</span>(s): <span class="code-comment">  # O(n) time, O(n) space (str is immutable)</span></span>
+<span class="code-line">    chars = <span class="code-bright">list</span>(s)</span>
+<span class="code-line" id="py-line-init">    left, right = <span class="code-value">0</span>, <span class="code-bright">len</span>(chars) - <span class="code-value">1</span></span>
+<span class="code-line" id="py-line-while">    <span class="code-accent">while</span> left &lt; right:</span>
+<span class="code-line" id="py-line-swap">        chars[left], chars[right] = chars[right], chars[left]</span>
+<span class="code-line">        left += <span class="code-value">1</span></span>
+<span class="code-line">        right -= <span class="code-value">1</span></span>
+<span class="code-line">    <span class="code-accent">return</span> <span class="code-value">''</span>.join(chars)</span></pre>
+        <div class="py-trace">
+          <div class="py-chars"    id="py-chars"    aria-hidden="true"></div>
+          <div class="py-pointers" id="py-pointers" aria-hidden="true"></div>
+        </div>
+        <div class="py-status" id="py-status">&gt;&gt;&gt; reverse_string("yaw s'nnaws")</div>
+      </div>
+    </div><!-- /#panel-python -->
 
 
     <!-- ==================================================================
@@ -447,19 +562,19 @@
       <div class="espresso-params">
         <div class="espresso-param">
           <span class="espresso-param-label">Dose</span>
-          <span class="espresso-param-value">18 g</span>
+          <span class="espresso-param-value">18 g</span>
         </div>
         <div class="espresso-param">
           <span class="espresso-param-label">Yield</span>
-          <span class="espresso-param-value">36 g</span>
+          <span class="espresso-param-value">36 g</span>
         </div>
         <div class="espresso-param">
           <span class="espresso-param-label">Time</span>
-          <span class="espresso-param-value">27 s</span>
+          <span class="espresso-param-value">27 s</span>
         </div>
         <div class="espresso-param">
           <span class="espresso-param-label">Temp</span>
-          <span class="espresso-param-value">93 °C</span>
+          <span class="espresso-param-value">93 °C</span>
         </div>
       </div>
 
@@ -477,7 +592,7 @@
           <span class="espresso-bag-key">Origin</span>
           <span class="espresso-bag-val">Peru, Cajamarca</span>
           <span class="espresso-bag-key">Elevation</span>
-          <span class="espresso-bag-val">1200–1900 masl</span>
+          <span class="espresso-bag-val">1200–1900 masl</span>
           <span class="espresso-bag-key">Process</span>
           <span class="espresso-bag-val">Washed</span>
           <span class="espresso-bag-key">Variety</span>

@@ -40,9 +40,14 @@
   /** rAF handle for the flight animation — lets us cancel mid-flight */
   var flightRaf = null;
 
+  /** rAF handle for the espresso needle's idle quiver — see section 5 */
+  var dialQuiverRaf = null;
+
   /** The default panel — shows the portrait photo when nothing is hovered */
   var defaultPanel = document.getElementById('panel-default');
 
+  /** Maps a panel id to the id of the .code-listing it should glitch, if any */
+  var CODE_LISTINGS = { assembly: 'asm-listing', science: 'science-listing' };
 
   /**
    * Activate a named panel, deactivating all others.
@@ -51,12 +56,17 @@
    * @param {string} id - The panel identifier (maps to element id "panel-{id}")
    */
   function showPanel(id) {
+    stopCodeGlitch();
+    stopDialQuiver();
+    stopPythonTrace();
     panels.forEach(function (p) { p.classList.remove('active'); });
     var target = document.getElementById('panel-' + id);
     if (target) {
       target.classList.add('active');
-      if (id === 'moved')     { runFlight(); }
-      if (id === 'espresso')  { initDial();  }
+      if (id === 'moved')    { runFlight();       }
+      if (id === 'espresso') { initDial();        }
+      if (id === 'python')   { startPythonTrace(); }
+      if (CODE_LISTINGS[id]) { startCodeGlitch(CODE_LISTINGS[id]); }
     }
   }
 
@@ -70,6 +80,9 @@
     hls.forEach(function (h) { h.classList.remove('active'); });
     /* Cancel any in-progress flight animation */
     if (flightRaf !== null) { cancelAnimationFrame(flightRaf); flightRaf = null; }
+    stopCodeGlitch();
+    stopDialQuiver();
+    stopPythonTrace();
   }
 
   /* Attach events to each hoverable word */
@@ -98,6 +111,36 @@
 
   /* Final safety net: reset if cursor exits the whole site grid */
   document.querySelector('.site').addEventListener('mouseleave', reset);
+
+
+  /* =========================================================================
+     2b. Code-terminal panel triggers (real links, not .hl words)
+     =========================================================================
+     "computer" and "science" in bio-2 are genuine <a> links to GitHub repos
+     (they still navigate on click), so they can't join the .hl group
+     without losing their link cursor. Instead each carries its own
+     data-panel attribute ("assembly" / "science") and gets the same
+     hover-swap behaviour, picked up generically via the [data-panel]
+     selector below — any future .bio-link can opt into its own panel
+     the same way.
+     ========================================================================= */
+
+  function bindAsmLinkEvents(links) {
+    links.forEach(function (link) {
+      link.addEventListener('mouseenter', function () {
+        showPanel(link.dataset.panel);
+      });
+
+      link.addEventListener('mouseleave', function (e) {
+        var next = e.relatedTarget;
+        var staysInGroup = next && next.classList &&
+          (next.classList.contains('hl') || next.dataset.panel === link.dataset.panel);
+        if (!staysInGroup) { reset(); }
+      });
+    });
+  }
+
+  bindAsmLinkEvents(document.querySelectorAll('.bio-link[data-panel]'));
 
 
   /* =========================================================================
@@ -416,6 +459,178 @@ if (indexLabelEl) {
   }
 
 
+  /* ── 4e. Code-terminal panels — listing line corruption
+     ───────────────────────────────────────────────────────────────────────
+     Shared by panel-assembly (#asm-listing) and panel-science
+     (#science-listing). While one is active, briefly flags a random
+     .code-line within its listing with .glitch every ~1.8-4s; the visual
+     jitter itself is a subtle pure-CSS keyframe animation (codeGlitch in
+     style.css) that removes itself. Only one listing is ever active at a
+     time, so a single timer handle is enough.                             */
+
+  var codeGlitchTimer = null;
+
+  /**
+   * @param {string} listingId - Element id of the .code-listing to corrupt
+   */
+  function startCodeGlitch(listingId) {
+    if (codeGlitchTimer !== null) return; /* already running */
+
+    var lines = document.querySelectorAll('#' + listingId + ' .code-line');
+    if (!lines.length) return;
+
+    function fireBurst() {
+      var line = lines[Math.floor(Math.random() * lines.length)];
+      line.classList.remove('glitch');
+      void line.offsetWidth; /* force reflow so the animation restarts */
+      line.classList.add('glitch');
+
+      codeGlitchTimer = setTimeout(fireBurst, 1000 + Math.random() * 2200);
+    }
+
+    fireBurst();
+  }
+
+  function stopCodeGlitch() {
+    if (codeGlitchTimer !== null) { clearTimeout(codeGlitchTimer); codeGlitchTimer = null; }
+    document.querySelectorAll('.code-line.glitch').forEach(function (l) {
+      l.classList.remove('glitch');
+    });
+  }
+
+
+  /* ── 4f. Python panel — two-pointer string-reversal trace
+     ───────────────────────────────────────────────────────────────────────
+     Unlike Assembly/Science (idle glitch on a static listing), this panel
+     actually runs reverse_string("yaw s'nnaws") one step at a time:
+     each frame highlights the current source line (#py-line-while /
+     #py-line-swap via .code-line-active) and redraws the character trace
+     with the L/R pointers under the two indices being compared/swapped.
+     Settled (already-reversed) characters pick up .py-done. Loops back to
+     the start after a longer pause on the final "returned" frame.        */
+
+  var PY_STRING = "yaw s'nnaws";
+
+  /**
+   * Precompute every frame of the two-pointer reversal, from the initial
+   * call through each compare/swap step to the final returned string.
+   *
+   * @param  {string} str
+   * @returns {Array.<Object>} frames — { chars, left, right, line, status }
+   */
+  function buildPyFrames(str) {
+    var chars = str.split('');
+    var left  = 0;
+    var right = chars.length - 1;
+    var frames = [];
+
+    frames.push({
+      chars: chars.slice(), left: left, right: right, line: 'init',
+      status: '>>> reverse_string("' + str + '")'
+    });
+
+    while (left < right) {
+      frames.push({
+        chars: chars.slice(), left: left, right: right, line: 'while',
+        status: 'comparing chars[' + left + '] and chars[' + right + ']'
+      });
+
+      var tmp = chars[left];
+      chars[left]  = chars[right];
+      chars[right] = tmp;
+
+      frames.push({
+        chars: chars.slice(), left: left, right: right, line: 'swap',
+        status: 'swapped → "' + chars.join('') + '"'
+      });
+
+      left++;
+      right--;
+    }
+
+    frames.push({
+      chars: chars.slice(), left: -1, right: -1, line: null,
+      status: "return '" + chars.join('') + "'  # done"
+    });
+
+    return frames;
+  }
+
+  /**
+   * Render a single trace frame into #py-chars / #py-pointers / #py-status
+   * and toggle the matching .code-line-active in the listing above it.
+   *
+   * @param {Object} frame - One entry from buildPyFrames()
+   */
+  function renderPyFrame(frame) {
+    var charsEl  = document.getElementById('py-chars');
+    var ptrEl    = document.getElementById('py-pointers');
+    var statusEl = document.getElementById('py-status');
+    if (!charsEl || !ptrEl || !statusEl) return;
+
+    charsEl.innerHTML = '';
+    ptrEl.innerHTML   = '';
+
+    frame.chars.forEach(function (ch, i) {
+      var settled = frame.left === -1 || i < frame.left || i > frame.right;
+
+      var charSpan = document.createElement('span');
+      charSpan.className = 'py-char' +
+        (i === frame.left || i === frame.right ? ' py-active' : '') +
+        (settled ? ' py-done' : '');
+      charSpan.textContent = ch === ' ' ? ' ' : ch;
+      charsEl.appendChild(charSpan);
+
+      var ptrSpan = document.createElement('span');
+      ptrSpan.className = 'py-pointer';
+      ptrSpan.textContent =
+        (i === frame.left && i === frame.right) ? 'LR' :
+        (i === frame.left) ? 'L' :
+        (i === frame.right) ? 'R' : ' ';
+      ptrEl.appendChild(ptrSpan);
+    });
+
+    statusEl.textContent = frame.status;
+
+    document.querySelectorAll('#python-listing .code-line-active').forEach(function (l) {
+      l.classList.remove('code-line-active');
+    });
+    var activeLine = frame.line && document.getElementById('py-line-' + frame.line);
+    if (activeLine) { activeLine.classList.add('code-line-active'); }
+  }
+
+  var pyTraceTimer  = null;
+  var pyTraceFrames = null;
+  var pyTraceIndex  = 0;
+
+  function startPythonTrace() {
+    if (pyTraceTimer !== null) return; /* already running */
+
+    pyTraceFrames = buildPyFrames(PY_STRING);
+    pyTraceIndex  = 0;
+
+    function stepFrame() {
+      renderPyFrame(pyTraceFrames[pyTraceIndex]);
+
+      var isLastFrame = pyTraceIndex === pyTraceFrames.length - 1;
+      /* Linger on the fully-reversed result before looping back to start */
+      var delay = isLastFrame ? 2600 : 850;
+      pyTraceIndex = isLastFrame ? 0 : pyTraceIndex + 1;
+
+      pyTraceTimer = setTimeout(stepFrame, delay);
+    }
+
+    stepFrame();
+  }
+
+  function stopPythonTrace() {
+    if (pyTraceTimer !== null) { clearTimeout(pyTraceTimer); pyTraceTimer = null; }
+    document.querySelectorAll('#python-listing .code-line-active').forEach(function (l) {
+      l.classList.remove('code-line-active');
+    });
+  }
+
+
   /* =========================================================================
      5. Espresso extraction dial
      =========================================================================
@@ -477,6 +692,11 @@ if (indexLabelEl) {
       if (t <= ZONES[i].max) return ZONES[i];
     }
     return ZONES[ZONES.length - 1];
+  }
+
+  /** Cancels the needle's idle-quiver rAF loop; see renderQuiver() inside initDial(). */
+  function stopDialQuiver() {
+    if (dialQuiverRaf !== null) { cancelAnimationFrame(dialQuiverRaf); dialQuiverRaf = null; }
   }
 
   /**
@@ -644,6 +864,21 @@ if (indexLabelEl) {
 
     updateDescriptors(pos);
 
+    /* ── Idle quiver ──
+       A subtle two-frequency sine tremor layered onto the needle's angle,
+       as if it's actively responding to line pressure rather than sitting
+       dead still. Runs continuously (drag included — eventToPos() still
+       writes the "true" pos each frame, the quiver just rides on top of
+       it) until the panel deactivates, when stopDialQuiver() cancels it. */
+    function renderQuiver() {
+      var now    = Date.now();
+      var quiver = Math.sin(now / 110) * 0.35 + Math.sin(now / 43) * 0.15;
+      needleGroup.setAttribute('transform',
+        'rotate(' + (posToAngle(pos) + quiver) + ' ' + CX + ' ' + CY + ')');
+      dialQuiverRaf = requestAnimationFrame(renderQuiver);
+    }
+    renderQuiver();
+
     /* ── Drag interaction ── */
 
     /**
@@ -680,9 +915,7 @@ if (indexLabelEl) {
 
     svgEl.addEventListener('pointermove', function (e) {
       if (!dragging) return;
-      pos = eventToPos(e);
-      needleGroup.setAttribute('transform',
-        'rotate(' + posToAngle(pos) + ' ' + CX + ' ' + CY + ')');
+      pos = eventToPos(e); /* renderQuiver()'s rAF loop picks up the new angle next frame */
       updateDescriptors(pos);
     });
 
@@ -711,14 +944,14 @@ if (indexLabelEl) {
    */
   var BIO_EN = [
     'I am a Brooklyn-based computer science <span class="hl" data-panel="professor">professor</span> and <span class="hl" data-panel="developer">programmer</span>. I was born in <span class="hl" data-panel="mexico">Mexico City</span>, and later <span class="hl" data-panel="moved">moved</span> to New York, where I studied at <span class="hl" data-panel="nyu">NYU</span>.',
-    'Although I mostly deal in the <a class="bio-link" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material" target="_blank">introductory</a> and <a class="bio-link" href="https://github.com/sebastianromerocruz/CS3113-Intro-To-Game-Programming?tab=readme-ov-file#cs-uy-3113-introduction-to-game-programming" target="_blank">video game programming</a> pedagogy space, I also have experience in other areas of <a class="bio-link" href="https://github.com/sebastianromerocruz/game-programming-in-assembly?tab=readme-ov-file#october-13th-2022" target="_blank">computer</a> <a class="bio-link" href="https://github.com/sebastianromerocruz/sonic-pi-lecture?tab=readme-ov-file#music-with-programming" target="_blank">science</a>.',
+    'Although I mostly deal in the <a class="bio-link" data-panel="python" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material" target="_blank">introductory</a> and <a class="bio-link" href="https://github.com/sebastianromerocruz/CS3113-Intro-To-Game-Programming?tab=readme-ov-file#cs-uy-3113-introduction-to-game-programming" target="_blank">video game programming</a> pedagogy space, I also have experience in other areas of <a class="bio-link" data-panel="assembly" href="https://github.com/sebastianromerocruz/game-programming-in-assembly?tab=readme-ov-file#october-13th-2022" target="_blank">computer</a> <a class="bio-link" data-panel="science" href="https://github.com/sebastianromerocruz/sonic-pi-lecture?tab=readme-ov-file#music-with-programming" target="_blank">science</a>.',
     'Outside of work, some of my interests involve <span class="hl" data-panel="lang-ja">learning</span> <span class="hl" data-panel="lang-cs">foreign</span> <span class="hl" data-panel="lang-la">languages</span>, <span class="hl" data-panel="music">music</span>, and obsessing over <span class="hl" data-panel="espresso">espresso</span>.',
     'Students can schedule office hours with me <a class="bio-link" href="https://calendly.com/profromerocruz/office-hours" target="_blank">here.</a> You can find me on <span class="hl" data-panel="contact">GitHub</span> if you would like to check out my work, on <span class="hl" data-panel="contact">LinkedIn</span>, or via <span class="hl" data-panel="contact">e-mail</span>.'
   ];
 
   var BIO_ES = [
     'Soy <span class="hl" data-panel="professor">profesor</span> y <span class="hl" data-panel="developer">programador</span> de ciencias de la computación en Brooklyn. Nací en la <span class="hl" data-panel="mexico">Ciudad de México</span> y después me <span class="hl" data-panel="moved">mudé</span> a Nueva York, donde estudié en <span class="hl" data-panel="nyu">NYU</span>.',
-    'Aunque me dedico principalmente a la pedagogía de programación <a class="bio-link" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material" target="_blank">introductoria</a> y de <a class="bio-link" href="https://github.com/sebastianromerocruz/CS3113-Intro-To-Game-Programming?tab=readme-ov-file#cs-uy-3113-introduction-to-game-programming" target="_blank">videojuegos</a>, también tengo experiencia en otras áreas de las <a class="bio-link" href="https://github.com/sebastianromerocruz/game-programming-in-assembly?tab=readme-ov-file#october-13th-2022" target="_blank">ciencias</a> <a class="bio-link" href="https://github.com/sebastianromerocruz/sonic-pi-lecture?tab=readme-ov-file#music-with-programming" target="_blank">computacionales</a>.',
+    'Aunque me dedico principalmente a la pedagogía de programación <a class="bio-link" data-panel="python" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material" target="_blank">introductoria</a> y de <a class="bio-link" href="https://github.com/sebastianromerocruz/CS3113-Intro-To-Game-Programming?tab=readme-ov-file#cs-uy-3113-introduction-to-game-programming" target="_blank">videojuegos</a>, también tengo experiencia en otras áreas de las <a class="bio-link" data-panel="assembly" href="https://github.com/sebastianromerocruz/game-programming-in-assembly?tab=readme-ov-file#october-13th-2022" target="_blank">ciencias</a> <a class="bio-link" data-panel="science" href="https://github.com/sebastianromerocruz/sonic-pi-lecture?tab=readme-ov-file#music-with-programming" target="_blank">computacionales</a>.',
     'Fuera del trabajo, me gusta <span class="hl" data-panel="lang-ja">aprender</span> <span class="hl" data-panel="lang-cs">idiomas</span> <span class="hl" data-panel="lang-la">extranjeros</span>, la <span class="hl" data-panel="music">música</span> y el <span class="hl" data-panel="espresso">espresso</span>.',
     'Mis estudiantes pueden programar horas de oficina <a class="bio-link" href="https://calendly.com/profromerocruz/office-hours" target="_blank">aquí.</a> Pueden encontrarme en <span class="hl" data-panel="contact">GitHub</span> para ver mi trabajo, en <span class="hl" data-panel="contact">LinkedIn</span>, o por <span class="hl" data-panel="contact">correo</span>.'
   ];
@@ -760,8 +993,9 @@ if (indexLabelEl) {
           /* Final frame: inject the real HTML with interactive spans */
           el.innerHTML = newHTML;
           clearInterval(interval);
-          /* Re-bind hover events to any new .hl elements inside this paragraph */
+          /* Re-bind hover events to any new .hl / asm-link elements inside this paragraph */
           bindHlEvents(el.querySelectorAll('.hl'));
+          bindAsmLinkEvents(el.querySelectorAll('.bio-link[data-panel]'));
           return;
         }
 
