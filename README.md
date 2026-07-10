@@ -540,7 +540,7 @@ Both panels use the same chip row structure: a fixed-width tier label on the lef
 
 `flex-wrap: wrap` on `.chip-items` allows chips to flow onto a new line if the panel is too narrow — responsive layout without media queries.
 
-### 5.4 Language panels — Japanese, Czech, Classical Latin
+### 5.4 Language panels — Japanese, Nahuatl, Classical Latin
 
 Each panel follows the same structure: a large ghosted initial letter, an index label, a translated bio paragraph, and footer links in the target language.
 
@@ -573,11 +573,11 @@ Three links styled as full-width rows with the handle right-aligned:
 
 ## 6. The Spanish language toggle
 
-Spanish is the native language — not a translation panel in the same mould as Japanese, Czech, or Latin, but the actual voice of the site. The feature is a small `ES★ / EN` button in the bottom-right corner of the left column. Clicking it rewrites all four bio paragraphs in place, using the text scramble effect, and flips the toggle state immediately.
+Spanish is the native language — not a translation panel in the same mould as Japanese, Nahuatl, or Latin, but the actual voice of the site. The feature is a small `ES★ / EN` button in the bottom-right corner of the left column. Clicking it rewrites all four bio paragraphs in place, using the text scramble effect, and flips the toggle state immediately.
 
 ### 6.1 Why this approach rather than another language panel
 
-The other language panels (Japanese, Czech, Latin) show a *snapshot* — a static translation, reached by hovering a word. They are things you peek at. Spanish is different: it's where Sebastián comes from, so switching to it should feel like switching the mode of the entire left column, not opening a side drawer.
+The other language panels (Japanese, Nahuatl, Latin) show a *snapshot* — a static translation, reached by hovering a word. They are things you peek at. Spanish is different: it's where Sebastián comes from, so switching to it should feel like switching the mode of the entire left column, not opening a side drawer.
 
 The toggle pattern communicates this. It replaces the source text, restructures the sentences, and changes the language of every interactive element — the panel trigger words, the links, the contact paragraph — so the site functions in Spanish, not just displays it.
 

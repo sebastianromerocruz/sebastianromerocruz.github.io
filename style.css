@@ -30,7 +30,7 @@
  *      7e. Degrees (NYU)
  *      7f. Kyūdō
  *      7g. Contact
- *      7h. Language panels (Japanese, Czech, Latin)
+ *      7h. Language panels (Japanese, Nahuatl, Latin)
  *   8. Entrance animations
  */
 
@@ -1119,7 +1119,7 @@ body {
 }
 
 
-/* 7h. Language panels (Japanese, Czech, Latin)
+/* 7h. Language panels (Japanese, Nahuatl, Latin)
    ─────────────────────────────────────────────────────────────────────────
    Each panel shows the bio translated into the target language.
    A large ghosted script character sits in the top-right corner.          */
