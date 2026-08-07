@@ -22,7 +22,7 @@
     panel-default   — portrait photo; shown when nothing is hovered
     panel-professor — courses taught
     panel-developer — programming language proficiency (chip treatment)
-    panel-assembly  — 6502 disassembler terminal, triggered by the
+    panel-assembly  — SM83 (Game Boy) source terminal, triggered by the
                       "computer" link (bio-2), not an .hl word
     panel-science   — Sonic Pi live-coding terminal, triggered by the
                       "science" link (bio-2), not an .hl word
@@ -62,6 +62,24 @@
 </head>
 
 <body>
+
+  <!-- ======================================================================
+       BOOT OVERLAY — plays once on load, then wipes away.
+       Full-screen, opaque, sits above everything (including the grain
+       overlay and cursor trail). Lines are appended into #boot-log by
+       main.js §1; the whole thing self-removes after the sequence ends.
+       See style.css §11 and main.js §1.
+       ====================================================================== -->
+  <div class="boot-overlay" id="boot-overlay" aria-hidden="true">
+    <pre class="boot-log" id="boot-log"></pre>
+  </div>
+
+  <!-- ======================================================================
+       GRAIN OVERLAY — persistent, animated film-grain texture over the
+       whole site (both columns). See style.css §11.
+       ====================================================================== -->
+  <div class="grain-overlay" aria-hidden="true"></div>
+
 <div class="site">
 
 
@@ -74,7 +92,7 @@
 
     <!-- Section index strip: label + extending hairline rule -->
     <div class="left-index">
-      <span class="left-index-label" id="left-index-label">01 / README.md</span>
+      <span class="left-index-label" id="left-index-label">I / INDEX</span>
       <div class="left-index-rule"></div>
     </div>
 
@@ -115,7 +133,7 @@
       <a class="bio-link" data-panel="python" href="https://github.com/sebastianromerocruz/CS1134-data-structures-and-algorithms?tab=readme-ov-file#cs-uy-1134-material" target="_blank">introductory</a>
       and <a class="bio-link" href="https://github.com/sebastianromerocruz/CS3113-Intro-To-Game-Programming?tab=readme-ov-file#cs-uy-3113-introduction-to-game-programming" target="_blank">video game programming</a>
       pedagogy space, I also have experience in other areas of
-      <a class="bio-link" data-panel="assembly" href="https://github.com/sebastianromerocruz/game-programming-in-assembly?tab=readme-ov-file#october-13th-2022" target="_blank">computer</a>
+      <a class="bio-link" data-panel="assembly" href="https://github.com/sebastianromerocruz/PONG.gb/blob/main/src/pong.asm" target="_blank">computer</a>
       <a class="bio-link" data-panel="science" href="https://github.com/sebastianromerocruz/sonic-pi-lecture?tab=readme-ov-file#music-with-programming" target="_blank">science</a>.
     </p>
 
@@ -182,19 +200,31 @@
     <div class="panel panel-default active" id="panel-default">
 
       <!--
-        Ghosted Bauhaus geometric mark — concentric circles, cross, diagonals,
-        red square centre. Renders at 4% opacity as a background texture.
+        ROMAN PROTOTYPE v3 — survey grid, replacing the sundial/hour-ring
+        mark (dropped — circles weren't landing) and the wreath before it.
+        A faint 20-unit lattice with a bolder central cross-axis: this is
+        the grid a Roman surveyor's groma laid out to found a city or
+        divide farmland — cardo maximus (N–S) and decumanus maximus (E–W)
+        crossing at the origin point. It's also just a grid, which is
+        about as Bauhaus/Swiss-modernist as a mark can get, so the two
+        references overlap here rather than compete. Pure straight lines,
+        no circles, no figurative shapes. Renders at 5% opacity.
       -->
       <div class="default-geo-bg">
         <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"
              aria-hidden="true">
-          <circle cx="60" cy="60" r="58" stroke="#0c0c0c" stroke-width="0.5"/>
-          <circle cx="60" cy="60" r="35" stroke="#0c0c0c" stroke-width="0.5"/>
-          <circle cx="60" cy="60" r="12" stroke="#0c0c0c" stroke-width="0.5"/>
-          <line x1="60"  y1="2"   x2="60"  y2="118" stroke="#0c0c0c" stroke-width="0.5"/>
-          <line x1="2"   y1="60"  x2="118" y2="60"  stroke="#0c0c0c" stroke-width="0.5"/>
-          <line x1="18"  y1="18"  x2="102" y2="102" stroke="#0c0c0c" stroke-width="0.5"/>
-          <line x1="102" y1="18"  x2="18"  y2="102" stroke="#0c0c0c" stroke-width="0.5"/>
+          <!-- Faint 20-unit lattice -->
+          <line x1="0"   y1="20"  x2="120" y2="20"  stroke="#0c0c0c" stroke-width="0.3"/>
+          <line x1="0"   y1="40"  x2="120" y2="40"  stroke="#0c0c0c" stroke-width="0.3"/>
+          <line x1="0"   y1="80"  x2="120" y2="80"  stroke="#0c0c0c" stroke-width="0.3"/>
+          <line x1="0"   y1="100" x2="120" y2="100" stroke="#0c0c0c" stroke-width="0.3"/>
+          <line x1="20"  y1="0"   x2="20"  y2="120" stroke="#0c0c0c" stroke-width="0.3"/>
+          <line x1="40"  y1="0"   x2="40"  y2="120" stroke="#0c0c0c" stroke-width="0.3"/>
+          <line x1="80"  y1="0"   x2="80"  y2="120" stroke="#0c0c0c" stroke-width="0.3"/>
+          <line x1="100" y1="0"   x2="100" y2="120" stroke="#0c0c0c" stroke-width="0.3"/>
+          <!-- Bolder central axis — cardo maximus / decumanus maximus -->
+          <line x1="60" y1="2"  x2="60"  y2="118" stroke="#0c0c0c" stroke-width="0.5"/>
+          <line x1="2"  y1="60" x2="118" y2="60"  stroke="#0c0c0c" stroke-width="0.5"/>
           <rect x="55" y="55" width="10" height="10" stroke="#cc3320" stroke-width="0.8"/>
         </svg>
       </div>
@@ -207,9 +237,11 @@
             Real photo — uncomment when asset is in place:
             <img src="assets/portrait.jpg" alt="Sebastian" class="default-photo-img" />
           -->
-<img src="assets/portrait-2.jpg" alt="Sebastián" class="default-photo-img" />
+<img src="assets/portrait.jpg" alt="Sebastián" class="default-photo-img" />
         </div>
         <div class="default-caption">Sebastián · Romero Cruz</div>
+        <!-- ROMAN PROTOTYPE — meander strip, see style.css §6 -->
+        <div class="default-meander" aria-hidden="true"></div>
       </div>
 
 
@@ -235,7 +267,7 @@
          ================================================================== -->
     <div class="panel" id="panel-professor">
       <div class="panel-bar"></div>
-      <div class="panel-index">02 / Teaching</div>
+      <div class="panel-index">II / DISCIPLINA</div>
       <h2 class="panel-title">Courses</h2>
 
       <div class="courses-list">
@@ -280,7 +312,7 @@
          ================================================================== -->
     <div class="panel" id="panel-developer">
       <div class="panel-bar"></div>
-      <div class="panel-index">03 / Practice</div>
+      <div class="panel-index">III / ARS</div>
       <h2 class="panel-title">Languages</h2>
 
       <div class="chip-group">
@@ -296,14 +328,16 @@
           <div class="chip-items">
             <span class="chip chip-outline">C++</span>
             <span class="chip chip-outline">C</span>
-            <span class="chip chip-outline">C#</span>
-            <span class="chip chip-outline">6502</span>
+            <span class="chip chip-outline">SM83</span>
           </div>
         </div>
         <div class="chip-row">
-          <span class="chip-row-label">Exploring</span>
+          <span class="chip-row-label">Familiar</span>
           <div class="chip-items">
-            <span class="chip chip-ghost">SM83</span>
+            <span class="chip chip-ghost">6502</span>
+            <span class="chip chip-outline">C#</span>
+            <span class="chip chip-ghost">Haskell</span>
+            <span class="chip chip-ghost">Shell Script</span>
           </div>
         </div>
       </div>
@@ -311,37 +345,48 @@
 
 
     <!-- ==================================================================
-         ASSEMBLY PANEL — 6502 disassembler terminal
-         Triggered by hovering "computer" in bio-2 (a real <a> link to a
-         GitHub repo, styled as .bio-link, not an .hl word — see the
-         dedicated binding in main.js section 2b). Shares the .code-terminal
-         scaffolding (style.css 7b2) with the SCIENCE panel just below.
+         ASSEMBLY PANEL — SM83 (Game Boy) source terminal
+         Triggered by hovering "computer" in bio-2 (a real <a> link to
+         github.com/sebastianromerocruz/PONG.gb, styled as .bio-link, not
+         an .hl word — see the dedicated binding in main.js section 2b).
+         Shares the .code-terminal scaffolding (style.css 7b2) with the
+         SCIENCE panel just below.
 
-         Static disassembly listing of a small NES sprite-DMA routine.
+         Formerly a 6502 (NES) disassembly listing; swapped for an SM83
+         excerpt since that's the daily-driver assembly work now. The
+         routine — UpdateComputer, the CPU paddle's AI in PONG.gb — is a
+         genuine coincidence with the "computer" trigger word, not staged.
+         Lines 1–15 of the real routine (push through the .moveUp branch);
+         .moveDown/.end/ret are cut for panel height, not fabricated away.
          main.js periodically flags a random .code-line as .glitch while
          this panel is active, which drives the CSS corruption animation.
          ================================================================== -->
     <div class="panel code-panel" id="panel-assembly">
       <div class="panel-bar"></div>
-      <div class="panel-index">04a / Assembly</div>
-      <h2 class="panel-title">6502</h2>
+      <div class="panel-index">IVa / MACHINA</div>
+      <h2 class="panel-title">SM83</h2>
 
       <div class="code-terminal">
         <div class="code-terminal-header">
           <span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span>
-          <span class="code-terminal-title">disasm &mdash; sprite_dma.s</span>
+          <span class="code-terminal-title">rgbasm &mdash; pong.asm</span>
         </div>
         <pre class="code-listing" id="asm-listing">
-<span class="code-line"><span class="code-accent">$8000</span> <span class="code-dim">A9 00</span>    <span class="code-bright">LDA</span> <span class="code-value">#$00</span>     <span class="code-comment">; A = 0</span></span>
-<span class="code-line"><span class="code-accent">$8002</span> <span class="code-dim">8D 00 20</span> <span class="code-bright">STA</span> <span class="code-value">$2000</span>    <span class="code-comment">; PPUCTRL</span></span>
-<span class="code-line"><span class="code-accent">$8005</span> <span class="code-dim">A2 10</span>    <span class="code-bright">LDX</span> <span class="code-value">#$10</span>     <span class="code-comment">; 16 sprites</span></span>
-<span class="code-line"><span class="code-accent">$8007</span> <span class="code-dim">BD 00 03</span> <span class="code-bright">LDA</span> <span class="code-value">$0300,X</span>  <span class="code-comment">; read OAM</span></span>
-<span class="code-line"><span class="code-accent">$800A</span> <span class="code-dim">9D 00 02</span> <span class="code-bright">STA</span> <span class="code-value">$0200,X</span>  <span class="code-comment">; shadow OAM</span></span>
-<span class="code-line"><span class="code-accent">$800D</span> <span class="code-dim">CA</span>       <span class="code-bright">DEX</span>              <span class="code-comment">; X--</span></span>
-<span class="code-line"><span class="code-accent">$800E</span> <span class="code-dim">D0 F7</span>    <span class="code-bright">BNE</span> <span class="code-value">$8007</span>    <span class="code-comment">; loop</span></span>
-<span class="code-line"><span class="code-accent">$8010</span> <span class="code-dim">A9 3F</span>    <span class="code-bright">LDA</span> <span class="code-value">#$3F</span>     <span class="code-comment">; palette hi</span></span>
-<span class="code-line"><span class="code-accent">$8012</span> <span class="code-dim">8D 06 20</span> <span class="code-bright">STA</span> <span class="code-value">$2006</span>    <span class="code-comment">; PPUADDR</span></span>
-<span class="code-line"><span class="code-accent">$8015</span> <span class="code-dim">60</span>       <span class="code-bright">RTS</span>              <span class="code-comment">; return</span></span></pre>
+<span class="code-line"><span class="code-accent">UpdateComputer:</span></span>
+<span class="code-line">  <span class="code-bright">push</span> <span class="code-value">af</span></span>
+<span class="code-line">  <span class="code-bright">ld</span> <span class="code-value">a, [wYComputer]</span></span>
+<span class="code-line">  <span class="code-bright">add</span> <span class="code-value">a, PAD_HEIGHT / 2</span> <span class="code-comment">; evaluated at assemble time</span></span>
+<span class="code-line">  <span class="code-bright">ld</span> <span class="code-value">b, a</span></span>
+<span class="code-line">  <span class="code-bright">ld</span> <span class="code-value">a, [wYBall]</span></span>
+<span class="code-line">  <span class="code-bright">cp</span> <span class="code-value">a, b</span></span>
+<span class="code-line">  <span class="code-bright">jr</span> <span class="code-value">nc, .moveDown</span></span>
+<span class="code-line"><span class="code-accent">.moveUp</span> <span class="code-comment">; ball higher</span></span>
+<span class="code-line">  <span class="code-bright">ld</span> <span class="code-value">a, [wYComputer]</span></span>
+<span class="code-line">  <span class="code-bright">cp</span> <span class="code-value">a, LOWER_BND</span></span>
+<span class="code-line">  <span class="code-bright">jr</span> <span class="code-value">z, .end</span></span>
+<span class="code-line">  <span class="code-bright">dec</span> <span class="code-value">a</span></span>
+<span class="code-line">  <span class="code-bright">ld</span> <span class="code-value">[wYComputer], a</span></span>
+<span class="code-line">  <span class="code-bright">jr</span> <span class="code-value">.end</span></span></pre>
         <div class="code-cursor" aria-hidden="true"></div>
       </div>
     </div><!-- /#panel-assembly -->
@@ -356,7 +401,7 @@
          ================================================================== -->
     <div class="panel code-panel" id="panel-science">
       <div class="panel-bar"></div>
-      <div class="panel-index">04b / Music-code</div>
+      <div class="panel-index">IVb / SONUS</div>
       <h2 class="panel-title">Sonic Pi</h2>
 
       <div class="code-terminal">
@@ -392,7 +437,7 @@
          ================================================================== -->
     <div class="panel code-panel" id="panel-python">
       <div class="panel-bar"></div>
-      <div class="panel-index">04c / Two-pointer</div>
+      <div class="panel-index">IVc / RATIO</div>
       <h2 class="panel-title">Python</h2>
 
       <div class="code-terminal">
@@ -460,7 +505,7 @@
 
       <!-- Text overlay — sits above the SVG via document stacking order -->
       <div class="flight-overlay">
-        <div class="panel-index">05 / Relocation</div>
+        <div class="panel-index">V / ITER</div>
         <h2 class="panel-title" style="font-size: clamp(1.5rem, 3vw, 2.6rem);">
           MEX<br>→ <em>JFK</em>
         </h2>
@@ -478,7 +523,7 @@
          ================================================================== -->
     <div class="panel" id="panel-nyu">
       <div class="panel-bar"></div>
-      <div class="panel-index">06 / Education</div>
+      <div class="panel-index">VI / STUDIA</div>
       <h2 class="panel-title">Degrees</h2>
 
       <div class="degrees">
@@ -505,12 +550,12 @@
          ================================================================== -->
     <div class="panel" id="panel-music">
       <div class="panel-bar"></div>
-      <div class="panel-index">07 / Music</div>
+      <div class="panel-index">VII / MUSICA</div>
       <h2 class="panel-title">Instruments</h2>
 
       <div class="chip-group">
         <div class="chip-row">
-          <span class="chip-row-label">Mastered</span>
+          <span class="chip-row-label">Main</span>
           <div class="chip-items">
             <span class="chip chip-solid">Bass</span>
           </div>
@@ -545,7 +590,7 @@
          ================================================================== -->
     <div class="panel" id="panel-espresso">
       <div class="panel-bar"></div>
-      <div class="panel-index">08 / Espresso</div>
+      <div class="panel-index">VIII / CAFEA</div>
 
       <!-- Dial SVG — populated by initDial() in main.js -->
       <svg id="espresso-dial"
@@ -609,7 +654,7 @@
          ================================================================== -->
     <div class="panel" id="panel-contact">
       <div class="panel-bar"></div>
-      <div class="panel-index">09 / Contact</div>
+      <div class="panel-index">IX / NUNTIUS</div>
       <h2 class="panel-title">Connect</h2>
 
       <div class="contact-links">

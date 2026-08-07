@@ -46,6 +46,13 @@
   --mid:   #6e6e6e;   /* Mid-grey for secondary labels             */
   --rule:  #d0cfc9;   /* Light warm-grey for horizontal rules      */
   --red:   #cc3320;   /* Signal red — accent only, used sparingly  */
+  --bronze: #9c7c46;  /* Aged brass — ROMAN PROTOTYPE, default panel only (§6) */
+
+  /* RGB triplets (no rgba()) for spots that need --red or the scanlines
+     at a variable alpha — see §12 dark-mode note. Keep --red-rgb in sync
+     with --red by hand; CSS can't derive one from the other. */
+  --red-rgb:  204, 51, 32;
+  --scan-rgb: 0, 0, 0;
 
   /* Type stacks */
   --sans: 'IBM Plex Sans', Helvetica, sans-serif;
@@ -183,7 +190,7 @@ body {
   display: inline;
   text-decoration: underline;
   text-decoration-style: dotted;
-  text-decoration-color: rgba(204,51,32,0.55);
+  text-decoration-color: rgba(var(--red-rgb), 0.55);
   text-underline-offset: 4px;
   text-decoration-thickness: 2px;
   transition: color 0.12s, text-decoration-color 0.12s, text-decoration-style 0.12s;
@@ -201,7 +208,7 @@ body {
   color: var(--black);
   text-decoration: underline;
   text-decoration-style: dotted;
-  text-decoration-color: rgba(204,51,32,0.55);
+  text-decoration-color: rgba(var(--red-rgb), 0.55);
   text-underline-offset: 4px;
   text-decoration-thickness: 2px;
   transition: color 0.12s, text-decoration-color 0.12s, text-decoration-style 0.12s;
@@ -406,7 +413,31 @@ body {
 .default-geo-bg svg {
   width: 80%;
   height: 80%;
-  opacity: 0.04;
+  opacity: 0.05;
+}
+
+/* The survey-grid mark's stroke colours are hardcoded attributes in the
+   markup (index.html) rather than CSS — but any stylesheet rule, even a
+   plain type selector, always outranks a presentation attribute, so these
+   two lines override all 12 lines/rect there and keep the mark following
+   the --black/--red tokens (and §12's dark-mode swap) without touching
+   the HTML. Same trick used for the D3/dial classes above. */
+.default-geo-bg svg line { stroke: var(--black); }
+.default-geo-bg svg rect { stroke: var(--red); }
+
+/* ROMAN PROTOTYPE — meander (Greek key) strip, sits below the photo
+   caption. Single restrained use of the motif per Rams discipline —
+   not repeated as a border elsewhere on the panel.                     */
+.default-meander {
+  position: absolute;
+  bottom: -0.6rem;
+  left: 0;
+  width: 120px;
+  height: 10px;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgdmlld0JveD0iMCAwIDEyIDEyIj48cGF0aCBkPSJNMCAxMiBMMCA0IEw0IDQgTDQgOCBMOCA4IEw4IDAgTDEyIDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzljN2M0NiIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9zdmc+");
+  background-repeat: repeat-x;
+  background-size: 12px 12px;
+  opacity: 0.4;
 }
 
 /* Photo frame — 1px solid border with offset shadow border */
@@ -641,8 +672,13 @@ body {
 }
 
 .code-terminal {
-  background: var(--black);
-  border: 1px solid var(--black);
+  /* Always literally dark, independent of --black — these panels are
+     meant to invert against the page (light OR dark mode) as "the
+     machine intruding," not to track the page's own background. The
+     hardcoded near-black text colours below (.code-listing etc.) all
+     assume this stays dark, so it can't follow the --black swap in §12. */
+  background: #0c0c0c;
+  border: 1px solid #0c0c0c;
   font-family: var(--mono);
   overflow: hidden;
   position: relative;
@@ -911,6 +947,14 @@ body {
   pointer-events: none;
 }
 
+/* D3-drawn elements (main.js §3) — classes set via .attr('class', …) so
+   colour lives here instead of hardcoded hex in JS, and follows §12's
+   dark-mode swap like everything else. */
+.flight-grid-line { stroke: var(--black); }
+.flight-trail     { stroke: var(--red); }
+.flight-marker    { fill: var(--red); }
+.flight-label     { fill: var(--mid); }
+
 
 /* 7e. Degrees (NYU panel)
    ─────────────────────────────────────────────────────────────────────────
@@ -970,6 +1014,19 @@ body {
    A semicircular SVG extraction gauge drawn by main.js (section 5).
    The panel itself just provides the SVG canvas and descriptor/param rows;
    all geometry and interactivity live in JavaScript.                       */
+
+/* Hand-drawn SVG elements (main.js §5) — classes set via the el() helper's
+   attrs object, colour lives here instead of hardcoded hex in JS, and
+   follows §12's dark-mode swap like everything else. */
+.dial-track        { stroke: var(--rule); }
+.dial-zone-off      { stroke: var(--rule); }
+.dial-zone-optimal  { stroke: var(--red); }
+.dial-tick          { stroke: var(--black); }
+.dial-label         { fill: var(--mid); }
+.dial-label-optimal { fill: var(--red); }
+.dial-center        { fill: var(--black); }
+.dial-needle-shaft  { stroke: var(--black); }
+.dial-needle-tip    { fill: var(--red); }
 
 /* SVG dial fills most of the panel width */
 #espresso-dial {
@@ -1254,12 +1311,14 @@ body {
   content: '';
   position: absolute;
   inset: 0;
+  /* --scan-rgb flips light↔dark in §12 so these stripes stay visible
+     against either page background instead of vanishing dark-on-dark. */
   background: repeating-linear-gradient(
     to bottom,
-    transparent          0px,
-    transparent          2px,
-    rgba(0, 0, 0, 0.018) 2px,
-    rgba(0, 0, 0, 0.018) 4px
+    transparent                     0px,
+    transparent                     2px,
+    rgba(var(--scan-rgb), 0.018)    2px,
+    rgba(var(--scan-rgb), 0.018)    4px
   );
   pointer-events: none;
   z-index: 100;
@@ -1436,4 +1495,139 @@ body {
 .motto:hover .motto-kanji {
   opacity: 1;
   transform: translateY(0);
+}
+
+
+/* ==========================================================================
+   11. Boot overlay & grain overlay  (EXPERIMENTAL — Signalis pass)
+   ==========================================================================
+   Two additions in the same spirit as §9 (glitch/net-art layer), but aimed
+   specifically at Signalis' register rather than generic 80s-terminal:
+     11a. Boot overlay — a brief system-boot sequence that plays once on
+          load, then wipes away. Text colour reuses --value's teal-green
+          (#9fd6c8) from the code-terminal panels rather than introducing
+          a new hue, so it reads as "the same machine," just at startup.
+     11b. Grain overlay — a persistent, always-moving film-grain texture
+          over the whole site (not just .right, unlike the §9b scanlines).
+          This is the one effect Signalis' screens never go without.
+   ========================================================================== */
+
+/* ── 11a. Boot overlay ── */
+
+.boot-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #0c0c0c; /* always literally dark — same reasoning as .code-terminal above */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* Wipe-out on exit — same stepped clip-path language as §9e's panel-wipe,
+   so the boot sequence and the panel transitions read as one system. */
+.boot-overlay.boot-hide {
+  animation: bootWipe 0.32s steps(8, end) forwards;
+  pointer-events: none;
+}
+
+@keyframes bootWipe {
+  0%   { opacity: 1; clip-path: inset(0 0 0 0); }
+  60%  { opacity: 1; clip-path: inset(0 0 60% 0); }
+  100% { opacity: 0; clip-path: inset(0 0 100% 0); }
+}
+
+.boot-log {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  line-height: 2;
+  letter-spacing: 0.04em;
+  color: #9fd6c8; /* same teal-green as .code-value in the terminal panels */
+  white-space: pre;
+}
+
+/* Blinking terminal cursor appended to the final boot line by main.js */
+.boot-cursor {
+  display: inline-block;
+  animation: codeBlink 1.1s steps(1) infinite; /* reuses §7b2's blink keyframe */
+}
+
+
+/* ── 11b. Grain overlay ── */
+
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998; /* above every panel, below .cursor-trail's 9999 */
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMjAnIGhlaWdodD0nMTIwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nMC44NScgbnVtT2N0YXZlcz0nMicgc3RpdGNoVGlsZXM9J3N0aXRjaCcvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPScxMDAlJyBoZWlnaHQ9JzEwMCUnIGZpbHRlcj0ndXJsKCUyM24pJy8+PC9zdmc+");
+  background-repeat: repeat;
+  background-size: 140px 140px;
+  mix-blend-mode: overlay;
+  /* Discrete jumps, not a smooth pan — reads as static, not a drifting
+     texture. steps(1, end) forces each keyframe to apply instantly. */
+  animation: grainShift 0.5s steps(1, end) infinite;
+}
+
+@keyframes grainShift {
+  0%   { background-position: 0px    0px;   }
+  10%  { background-position: -37px  -18px; }
+  20%  { background-position: 12px   -54px; }
+  30%  { background-position: -64px  9px;   }
+  40%  { background-position: 27px   41px;  }
+  50%  { background-position: -8px   -33px; }
+  60%  { background-position: 53px   6px;   }
+  70%  { background-position: -21px  47px;  }
+  80%  { background-position: 33px   -22px; }
+  90%  { background-position: -49px  15px;  }
+  100% { background-position: 0px    0px;   }
+}
+
+
+/* ==========================================================================
+   12. Dark mode (prefers-color-scheme)
+   ==========================================================================
+   Remaps the five palette tokens as a single consistent pair-swap:
+   --black and --white trade places (ink ↔ ground), --mid/--rule/--red get
+   analogous dark-mode-appropriate values that preserve the same *relative*
+   contrast the light palette has (--rule stays a low-contrast, barely-there
+   hairline; --red stays legible without turning neon).
+
+   Because virtually every component in this file reads its colour from
+   these tokens — including the two "inverted fill" pairs (chip-solid,
+   .name-heading/.panel-title em) that use --black and --white *together*
+   — the whole system reflows correctly for free. Two things are
+   deliberately excluded and pinned to a literal #0c0c0c regardless of
+   mode: .code-terminal and .boot-overlay (see their own comments, §7b2
+   and §11a) — those are meant to read as "the machine," always dark,
+   not as page chrome that should invert.
+
+   Everything else that needed fixing to actually respond here — the D3
+   flight chart, the espresso dial, the default-panel survey grid, the
+   scanline overlay — got moved off hardcoded hex earlier in this file
+   (see §7d, §7f, §6, §9b) specifically so this block would be sufficient
+   on its own, with no JS changes needed at dark-mode-toggle time.
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --black:  #f4f3ef;   /* was the ink colour, now light — chip-solid etc. still work as a pair */
+    --white:  #131311;   /* warm near-black ground, echoes the light mode's warm-off-white undertone */
+    --mid:    #9b9a94;   /* lightened so secondary labels stay legible on the dark ground */
+    --rule:   #2c2b27;   /* darkened so hairlines stay a subtle, low-contrast line rather than a bright one */
+    --red:    #e6483a;   /* slightly brightened — the light-mode red reads a touch muddy on a dark ground */
+    --bronze: #c9a662;   /* brightened aged brass, keeps the meander strip visible (see swap below) */
+
+    --red-rgb:  230, 72, 58;   /* kept in sync with --red above */
+    --scan-rgb: 255, 255, 255; /* CRT scanlines flip from dark-on-light to light-on-dark */
+  }
+
+  /* The meander strip's colour is baked into a base64 SVG data URI (can't
+     be reached by a CSS token), so it needs its own swap to a brighter
+     brass tone rather than just relying on --bronze. */
+  .default-meander {
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgdmlld0JveD0iMCAwIDEyIDEyIj48cGF0aCBkPSJNMCAxMiBMMCA0IEw0IDQgTDQgOCBMOCA4IEw4IDAgTDEyIDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2M5YTY2MiIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9zdmc+");
+  }
 }

@@ -3,6 +3,7 @@
  * Personal site for Sebastián
  *
  * Responsibilities:
+ *   1. Boot sequence — one-time system-boot overlay on page load
  *   2. Panel switching — show/hide right-column panels on .hl word hover
  *   3. D3 flight animation — animated arc from Mexico City to New York
  *
@@ -15,6 +16,84 @@
 
 (function () {
   'use strict';
+
+
+  /* =========================================================================
+     1. Boot sequence
+     =========================================================================
+     Plays once per page load, before anything else is interactive: a black
+     overlay with a few lines of monospace "system boot" text appended one
+     at a time, then a stepped wipe-out (same clip-path language as the
+     panel transitions in §9e of style.css) reveals the actual site.
+
+     Skipped entirely — sessionStorage-gated — on repeat loads within the
+     same tab session, so it doesn't get old on refresh during a visit.
+
+     toRomanNumeral is defined later (§4c) but called here; function
+     declarations are hoisted, so this is safe.
+     ========================================================================= */
+
+  (function bootSequence() {
+    var overlay = document.getElementById('boot-overlay');
+    var logEl   = document.getElementById('boot-log');
+    if (!overlay || !logEl) { return; }
+
+    if (sessionStorage.getItem('bootPlayed')) {
+      overlay.remove();
+      return;
+    }
+    sessionStorage.setItem('bootPlayed', '1');
+
+    /* Entirely in Latin, "OK" rendered as RECTE ("rightly/correctly")
+       rather than kept as an English loan. Grammar notes:
+         - SYSTEMA is neuter, so its closing status word must agree:
+           PARATUM, not the masculine PARATUS.
+         - TABULAE (boards/panels/notice-tablets — the same word for the
+           Twelve Tables, Duodecim Tabulae) is plural, so its verb is
+           the plural ONERANTUR, not the singular used on the other lines.
+         - HOROLOGIUM ("clock" — a genuine classical/Late-Latin word,
+           attested for sundials and water-clocks) is a nod to the
+           default-panel's survey-grid mark and the AUC date below it.
+       .DAT stays as-is — a three-letter file extension is a technical
+       convention, not vocabulary; translating it would read as noise
+       rather than Latin. */
+    var aucYear = new Date().getFullYear() + 753;
+    var lines = [
+      'SYSTEMA INITIATUR...',
+      'VITAE.DAT ONERATUR... RECTE',
+      'MEMORIA COMPONITUR... RECTE',
+      'TABULAE[XV] ONERANTUR... RECTE',
+      'HOROLOGIUM ORDINATUR... RECTE',
+      'AUC ' + toRomanNumeral(aucYear),
+      'PARATUM'
+    ];
+
+    lines.forEach(function (line, i) {
+      setTimeout(function () {
+        var lineEl = document.createElement('div');
+        lineEl.textContent = line;
+        /* Blinking cursor on the final line only */
+        if (i === lines.length - 1) {
+          var cursor = document.createElement('span');
+          cursor.className = 'boot-cursor';
+          cursor.textContent = '_';
+          lineEl.appendChild(cursor);
+        }
+        logEl.appendChild(lineEl);
+      }, i * 150);
+    });
+
+    /* Wipe out after the last line has had a moment to sit, then remove
+       the overlay from the DOM entirely (not just hidden) once the wipe
+       animation finishes. */
+    var totalDelay = lines.length * 150 + 400;
+    setTimeout(function () {
+      overlay.classList.add('boot-hide');
+      overlay.addEventListener('animationend', function () {
+        overlay.remove();
+      }, { once: true });
+    }, totalDelay);
+  })();
 
 
   /* =========================================================================
@@ -176,14 +255,14 @@
       grid.append('line')
         .attr('x1', x).attr('y1', 0)
         .attr('x2', x).attr('y2', H)
-        .attr('stroke', '#0c0c0c')
+        .attr('class', 'flight-grid-line')
         .attr('stroke-width', 0.5);
     }
     for (var y = 0; y < H; y += 40) {
       grid.append('line')
         .attr('x1', 0).attr('y1', y)
         .attr('x2', W).attr('y2', y)
-        .attr('stroke', '#0c0c0c')
+        .attr('class', 'flight-grid-line')
         .attr('stroke-width', 0.5);
     }
 
@@ -199,7 +278,7 @@
     var trail = svg.append('path')
       .attr('d', 'M' + mx.x + ',' + mx.y + ' Q' + cpx + ',' + cpy + ' ' + ny.x + ',' + ny.y)
       .attr('fill', 'none')
-      .attr('stroke', '#cc3320')
+      .attr('class', 'flight-trail')
       .attr('stroke-width', 1)
       .attr('opacity', 0.75);
 
@@ -223,7 +302,7 @@
         .attr('y', city.y - 3.5)
         .attr('width',  7)
         .attr('height', 7)
-        .attr('fill', '#cc3320')
+        .attr('class', 'flight-marker')
         .attr('opacity', 0)
         .transition()
           .delay(i ? 2200 : 100) /* NYC marker appears when path arrives */
@@ -238,7 +317,7 @@
         .attr('font-family',      "'IBM Plex Mono',monospace")
         .attr('font-size',        '0.5rem')
         .attr('letter-spacing',   '0.14em')
-        .attr('fill',             '#6e6e6e')
+        .attr('class',            'flight-label')
         .attr('opacity',          0)
         .text(city.lbl)
         .transition()
@@ -410,12 +489,36 @@ document.addEventListener('mousemove', function (e) {
 
 /* ── 4c. Index label periodic corruption
    ─────────────────────────────────────────────────────────────────────────
-   Every 5–9 seconds the "01 / README.md" label briefly scrambles and
-   restores — same terminal-noise effect as the old Republican date.        */
+   Every 5–9 seconds the "I / INDEX" label briefly scrambles and restores —
+   same terminal-noise effect as the old Republican date. On load, an AUC
+   (ab urbe condita) year is computed and appended — the Roman-Republic-
+   persisted-into-the-80s conceit made literal in the one place the site
+   already tracked a calendar system.                                      */
+
+/** Convert a positive integer to a Roman numeral string. */
+function toRomanNumeral(num) {
+  var table = [
+    [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
+    [100,  'C'], [90,  'XC'], [50,  'L'], [40,  'XL'],
+    [10,   'X'], [9,   'IX'], [5,   'V'], [4,   'IV'],
+    [1,    'I']
+  ];
+  var result = '';
+  table.forEach(function (pair) {
+    while (num >= pair[0]) { result += pair[1]; num -= pair[0]; }
+  });
+  return result;
+}
 
 var indexLabelEl = document.getElementById('left-index-label');
 
 if (indexLabelEl) {
+  /* Rome's traditional founding year is 753 BCE, so a Gregorian year AD
+     maps to AUC by adding 753 (no year-zero correction needed here — we
+     only ever render the current year, always well into the AD range). */
+  var aucYear = new Date().getFullYear() + 753;
+  indexLabelEl.textContent = indexLabelEl.textContent + ' · AUC ' + toRomanNumeral(aucYear);
+
   var indexLabelOriginal = indexLabelEl.textContent;
 
   /**
@@ -757,13 +860,13 @@ if (indexLabelEl) {
       d: 'M ' + aStart.x + ' ' + aStart.y +
          ' A ' + R + ' ' + R + ' 0 0 1 ' + aEnd.x + ' ' + aEnd.y,
       fill: 'none',
-      stroke: '#d0cfc9',
+      class: 'dial-track',
       'stroke-width': '2',
       'stroke-linecap': 'round'
     }));
 
-    /* Zone colour arcs — under (faint blue-grey), sweet (red), over (faint) */
-    var zoneColors = ['#d0cfc9', '#cc3320', '#d0cfc9'];
+    /* Zone colour arcs — under (faint, rule colour), sweet (red), over (faint) */
+    var zoneClasses = ['dial-zone-off', 'dial-zone-optimal', 'dial-zone-off'];
     ZONES.forEach(function (zone, i) {
       var a0 = posToAngle(zone.min);
       var a1 = posToAngle(zone.max);
@@ -774,7 +877,7 @@ if (indexLabelEl) {
         d: 'M ' + p0.x + ' ' + p0.y +
            ' A ' + R + ' ' + R + ' 0 ' + large + ' 1 ' + p1.x + ' ' + p1.y,
         fill: 'none',
-        stroke: zoneColors[i],
+        class: zoneClasses[i],
         'stroke-width': i === 1 ? '2.5' : '1.5',
         'stroke-linecap': 'butt',
         opacity: i === 1 ? '0.35' : '1'
@@ -789,7 +892,7 @@ if (indexLabelEl) {
       svgEl.appendChild(el('line', {
         x1: inner.x, y1: inner.y,
         x2: outer.x, y2: outer.y,
-        stroke: '#0c0c0c',
+        class: 'dial-tick',
         'stroke-width': '0.75'
       }));
     });
@@ -812,7 +915,7 @@ if (indexLabelEl) {
       tEl.setAttribute('font-family', "'IBM Plex Mono', monospace");
       tEl.setAttribute('font-size', '6.5');
       tEl.setAttribute('letter-spacing', '0.08em');
-      tEl.setAttribute('fill', def.text === 'OPTIMAL' ? '#cc3320' : '#6e6e6e');
+      tEl.setAttribute('class', def.text === 'OPTIMAL' ? 'dial-label-optimal' : 'dial-label');
       tEl.setAttribute('opacity', def.text === 'OPTIMAL' ? '0.55' : '0.65');
       tEl.textContent = def.text;
       svgEl.appendChild(tEl);
@@ -821,7 +924,7 @@ if (indexLabelEl) {
     /* Centre dot */
     svgEl.appendChild(el('circle', {
       cx: CX, cy: CY, r: '4',
-      fill: '#0c0c0c'
+      class: 'dial-center'
     }));
 
     /* Needle group — rotated around (CX, CY) */
@@ -832,7 +935,7 @@ if (indexLabelEl) {
     needleGroup.appendChild(el('line', {
       x1: CX, y1: CY,
       x2: CX + R - 12, y2: CY,
-      stroke: '#0c0c0c',
+      class: 'dial-needle-shaft',
       'stroke-width': '1.5',
       'stroke-linecap': 'round'
     }));
@@ -841,7 +944,7 @@ if (indexLabelEl) {
     needleGroup.appendChild(el('rect', {
       x: CX + R - 16, y: CY - 3,
       width: '6', height: '6',
-      fill: '#cc3320'
+      class: 'dial-needle-tip'
     }));
 
     svgEl.appendChild(needleGroup);
